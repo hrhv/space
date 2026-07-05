@@ -243,6 +243,13 @@ article :not(.article-title) {
 	margin: 0.25em 0;
 }
 
+.cover-image {
+	width: 100%;
+	height: auto;
+	border-radius: 4px;
+	margin-bottom: 1rem;
+}
+
 .blog-post {
 	font-size: clamp(1rem, 0.96rem + 0.22vw, 1.125rem);
 }

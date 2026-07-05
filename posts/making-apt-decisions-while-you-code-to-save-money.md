@@ -1,9 +1,11 @@
 ---
-title: "Making apt decisions while you code to save money"
+title: Making apt decisions while you code to save money
 slug: making-apt-decisions-while-you-code-to-save-money
-description: "One small implementation decision — treating jobs as a set vs. individually — can have a meaningful impact on infrastructure cost."
-added: 2019-09-13
-tags: ["engineering", "architecture"]
+description: One small implementation decision — treating jobs as a set vs. individually — can have a meaningful impact on infrastructure cost.
+tags:
+  - engineering
+  - architecture
+added: 2019-09-13T00:00:00.000Z
 ---
 
 It’s fairly common to find students coding all through their college and I was one of the lot — played around with a lot of code, services, APIs, hooks, bots and what not. I used to be confident that I’m pretty good at what I do, until now when stepping out of that confined water bucket into the ocean made me realise that I’m not at par with practices adopted by the industry. And one of the most underrated yet essential aspect of product design is **making apt decisions**, which I’m going to talk about in this post.
@@ -12,25 +14,27 @@ Let me make my point with the help of a small example.
 
 Let’s say we have an architecture like -
 
-![Example architecture](https://cdn.hashnode.com/res/hashnode/image/upload/v1620820617262/lEqSMla3-.png)*Example architecture*
+![Example architecture](https://cdn.hashnode.com/res/hashnode/image/upload/v1620820617262/lEqSMla3-.png "Example Architecture")
 
 Assuming that each replica of the codebase can do only one job at a time and it takes ‘t’ time for one replica to complete one task, only after which can it take up the next one, consider -
-> ***Case I** — Where Job #A — {Job #1, Job #2, Job #3} i.e. Job #A is a collective job which strictly needs to be completed sequentially. When the replicas take up jobs, the situation is something like -*
 
-Replica #1 &lt;= Job #A : Running time = 3t
+***Case I — Where Job #A — {Job #1, Job #2, Job #3} i.e. Job #A is a collective job which strictly needs to be completed sequentially. When the replicas take up jobs, the situation is something like -***
 
-Replica #2 &lt;= Job #4 : Running time = t
+Replica #1 \<= Job #A : Running time = 3t
 
-Replica #3 &lt;= Job #5 : Running time = t
+Replica #2 \<= Job #4 : Running time = t
+
+Replica #3 \<= Job #5 : Running time = t
 
 In this case, the total time the system will take to complete all the five jobs would be 3t.
-> ***Case II** — Where all the five jobs are independent. When the replicas take up jobs now, one of the permutations of the possible situations is something like -*
 
-Replica #1 &lt;= Job #1, Job #4 : Running time = 2t
+***Case II — Where all the five jobs are independent. When the replicas take up jobs now, one of the permutations of the possible situations is something like -***
 
-Replica #2 &lt;= Job #2, Job #5 : Running time = 2t
+Replica #1 \<= Job #1, Job #4 : Running time = 2t
 
-Replica #3 &lt;= Job #3 : Running time = t
+Replica #2 \<= Job #2, Job #5 : Running time = 2t
+
+Replica #3 \<= Job #3 : Running time = t
 
 In this case, the total time the system will take to complete all the five jobs would be 2t.
 
@@ -41,5 +45,3 @@ Clearly, from the above example, we can see that one small implementation decisi
 Just something to ponder over!
 
 Cheers 🍻
-
-*Originally published at [https://premagious.xyz](https://premagious.xyz/making-apt-decisions-while-you-code-to-save-money/) on September 13, 2019.*

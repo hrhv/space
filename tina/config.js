@@ -124,6 +124,11 @@ export default defineConfig({
 						dateFormat: "MMM DD YYYY",
 					},
 					{
+						label: "Cover Image",
+						name: "coverImage",
+						type: "image",
+					},
+					{
 						type: "rich-text",
 						name: "body",
 						label: "Body",
