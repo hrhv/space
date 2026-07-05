@@ -28,13 +28,30 @@ export default defineConfig({
 				fields: [
 					{
 						type: "string",
+						label: "Name",
+						name: "name",
+					},
+					{
+						type: "string",
 						label: "Site Title",
 						name: "title",
 					},
 					{
 						type: "string",
-						label: "Site subtitle",
+						label: "Site Subtitle",
 						name: "subtitle",
+					},
+					{
+						type: "object",
+						label: "Social Links",
+						name: "social",
+						fields: [
+							{ type: "string", label: "GitHub", name: "github" },
+							{ type: "string", label: "LinkedIn", name: "linkedin" },
+							{ type: "string", label: "Twitter / X", name: "twitter" },
+							{ type: "string", label: "YouTube", name: "youtube" },
+							{ type: "string", label: "Bluesky", name: "bluesky" },
+						],
 					},
 				],
 				ui: {
@@ -87,40 +104,6 @@ export default defineConfig({
 						name: "tags",
 						type: "string",
 						list: true,
-						options: [
-							{
-								value: "technical",
-								label: "Technical",
-							},
-							{
-								value: "advice",
-								label: "Advice",
-							},
-							{
-								value: "events",
-								label: "Events",
-							},
-							{
-								value: "learning",
-								label: "Learning",
-							},
-							{
-								value: "meta",
-								label: "Meta",
-							},
-							{
-								value: "work",
-								label: "Work",
-							},
-							{
-								value: "personal",
-								label: "Personal",
-							},
-							{
-								value: "projects",
-								label: "Projects",
-							},
-						],
 					},
 					{
 						label: "Added",

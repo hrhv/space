@@ -1,23 +1,33 @@
 ---
 import HeaderLink from "./HeaderLink.astro";
-import { title, subtitle } from "../settings/settings.json"
+import { name, subtitle, social } from "../settings/settings.json";
 
 ---
 
 <header>
 	<div class="header-section">
 		<div class="header-frame">
-			<h1>{title}</h1>
+			<!-- TODO: replace {{PHOTO_PATH}} with actual photo once available -->
+			<!-- <img src="{{PHOTO_PATH}}" alt={name} class="avatar" /> -->
+			<h1><a href="/">{name}</a></h1>
 			<h2>{subtitle}</h2>
 		</div>
 	</div>
 </header>
 <nav>
 	<HeaderLink href="/">home</HeaderLink>
-	<HeaderLink href="/posts">posts</HeaderLink>
-	<HeaderLink href="https://cassidoo.co/newsletter">etc</HeaderLink>
+	<HeaderLink href="/blog">blog</HeaderLink>
+	<HeaderLink href={social.github} target="_blank" rel="noopener noreferrer">github</HeaderLink>
+	<HeaderLink href={social.linkedin} target="_blank" rel="noopener noreferrer">linkedin</HeaderLink>
+	<HeaderLink href={social.twitter} target="_blank" rel="noopener noreferrer">x</HeaderLink>
+	<HeaderLink href={social.youtube} target="_blank" rel="noopener noreferrer">youtube</HeaderLink>
+	<HeaderLink href={social.bluesky} target="_blank" rel="noopener noreferrer">bluesky</HeaderLink>
 </nav>
 <style>
+	h1 a {
+		text-decoration: none;
+		color: inherit;
+	}
 	h2 {
 		margin: 0.5em 0;
 	}

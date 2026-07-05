@@ -5,39 +5,82 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import HomePosts from "../components/HomePosts.astro";
 import ColorScript from "../components/ColorScript.astro";
-import Tags from "../components/Tags.astro";
-import { title, subtitle } from "../settings/settings.json"
-import { Content as About } from "./about.md";
-import getTags from "../scripts/getTags";
+import { name, title, subtitle, social } from "../settings/settings.json";
 
 const posts = await getCollection("posts");
-const tags = getTags(posts);
 ---
 
 <!doctype html>
 <html lang="en-us">
 	<BaseHead title={title} description={subtitle} />
 	<body>
-		<Header title={title} />
+		<Header />
 		<main>
-			<About />
+			<section class="bio">
+				<!-- TODO: replace {{PHOTO_PATH}} with actual photo, e.g. /assets/harshit.jpg -->
+				<!-- <img src="{{PHOTO_PATH}}" alt={name} class="avatar" /> -->
 
-			<br />
+				<!-- TODO: replace bio paragraph below with final copy -->
+				<p>
+					Hey, I'm {name} — a product and engineering enthusiast who experiments
+					with open-source, JavaScript, APIs, and the darker corners of the web.
+					I work at <a href="https://imagekit.io">ImageKit</a> and write here
+					about whatever I'm learning.
+				</p>
 
-			<h3>Here's my most recent posts</h3>
+				<nav class="bio-links">
+					<a href="/blog">blog</a>
+					<a href={social.github} target="_blank" rel="noopener noreferrer">github</a>
+					<a href={social.linkedin} target="_blank" rel="noopener noreferrer">linkedin</a>
+					<a href={social.twitter} target="_blank" rel="noopener noreferrer">x</a>
+					<a href={social.youtube} target="_blank" rel="noopener noreferrer">youtube</a>
+					<a href={social.bluesky} target="_blank" rel="noopener noreferrer">bluesky</a>
+					<a href="https://i.harshitbudhraja.com/resume" target="_blank" rel="noopener noreferrer">resume</a>
+				</nav>
+			</section>
+
+			<hr />
+
+			<h3>Latest posts</h3>
 
 			<HomePosts allPosts={posts} />
 
 			<p class="center">
-				You can also <a href="https://blahg.netlify.app/rss.xml">
-					subscribe with RSS!
-				</a>
+				<a href="/blog">all posts →</a>
+				&nbsp;&nbsp;
+				<a href="/rss.xml">rss</a>
 			</p>
-			<br />
-
-			<Tags tags={tags} all />
 		</main>
 		<Footer />
 		<ColorScript />
 	</body>
 </html>
+
+<style>
+	.bio {
+		margin: 2rem 0;
+	}
+
+	.bio p {
+		font-size: 1.05rem;
+		line-height: 1.7;
+		margin-bottom: 1.2rem;
+	}
+
+	.bio-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 1.5rem;
+		position: static;
+		text-align: left;
+		background: transparent;
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
+	}
+
+	.bio-links a {
+		text-decoration: underline;
+		text-decoration-thickness: 0.3ex;
+		text-underline-offset: 0.3ex;
+	}
+</style>

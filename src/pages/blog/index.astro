@@ -1,12 +1,12 @@
 ---
 import { getCollection } from "astro:content";
-import BaseHead from "../components/BaseHead.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
-import Post from "../components/Post.astro";
-import ColorScript from "../components/ColorScript.astro";
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import Post from "../../components/Post.astro";
+import ColorScript from "../../components/ColorScript.astro";
 
-import { title, subtitle } from "../settings/settings.json"
+import { title, subtitle } from "../../settings/settings.json"
 
 let posts = await getCollection("posts");
 
@@ -19,7 +19,7 @@ posts = posts.sort(
 
 <!doctype html>
 <html lang="en-us">
-	<BaseHead title={title} description={subtitle} />
+	<BaseHead title={`Blog — ${title}`} description={subtitle} />
 	<body>
 		<Header />
 		<main>
@@ -37,7 +37,7 @@ posts = posts.sort(
 			</content>
 
 			<p class="center">
-				You can also <a href="https://blahg.netlify.app/rss.xml">
+				You can also <a href="/rss.xml">
 					subscribe with RSS!
 				</a>
 			</p>

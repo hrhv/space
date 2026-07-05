@@ -1,11 +1,19 @@
 {
-	"name": "@cassidoo/blahg",
-	"version": "0.0.6",
+	"name": "@hrhv/space",
+	"version": "0.0.1",
 	"private": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/hrhv/space.git"
+	},
+	"author": {
+		"name": "Harshit Budhraja",
+		"url": "https://harshitbudhraja.com"
+	},
 	"scripts": {
 		"dev": "npx tinacms dev -c \"astro dev\"",
 		"start": "astro dev",
-		"build": "tinacms build && astro build",
+		"build": "export $(cat .env | xargs) && tinacms build && astro build",
 		"preview": "astro preview",
 		"astro": "astro"
 	},

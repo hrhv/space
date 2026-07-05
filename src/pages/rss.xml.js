@@ -17,7 +17,7 @@ export const GET = () =>
 		site: import.meta.env.SITE,
 		items: posts.map((post) => {
 			return {
-				link: `/post/${post.data.slug}`,
+				link: `/blog/${post.data.slug}`,
 				title: post.data.title,
 				pubDate: post.data.added,
 				description: post.data.description,

@@ -1,9 +1,23 @@
-Welcome to this blog template by [cassidoo](https://cassidoo.co)!
+---
+title: About
+description: About Harshit Budhraja
+layout: ../layouts/BlogPost.astro
+added: 2024-01-01
+tags: []
+slug: about
+---
 
-It's using Astro and TinaCMS. You can [clone it on GitHub](https://github.com/cassidoo/blahg) to use it for yourself, and see how it works! I would _love_ if you told me when you do use it, I love seeing variations on it!
+<!-- TODO: replace with final about page copy -->
 
-The tags at the bottom of the page are dynamically generated. The more tags you use, the more tags are added to the list! Posts are simple markdown files.
+Hey, I'm Harshit — a product and engineering enthusiast based in India.
 
-You should also check out [my newsletter](https://cassidoo.co/newsletter) or my [GitHub profile](https://github.com/cassidoo). Or don't. Follow your dreams.
+I work at [ImageKit](https://imagekit.io), where I focus on product. Outside of that, I experiment with open-source, JavaScript, APIs, homelabs, and the darker corners of the internet.
 
-Enjoy!
+This blog is where I write about what I'm building and learning.
+
+- GitHub: [hrhv](https://github.com/hrhv)
+- LinkedIn: [harshitbudhraja](https://linkedin.com/in/harshitbudhraja)
+- X: [@harshitbudhraja](https://x.com/harshitbudhraja)
+- YouTube: [prodengg](https://www.youtube.com/@prodengg)
+- Bluesky: [@harshitbudhraja.com](https://bsky.app/profile/harshitbudhraja.com)
+- Resume: [i.harshitbudhraja.com/resume](https://i.harshitbudhraja.com/resume)

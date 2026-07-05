@@ -12,13 +12,11 @@ pnpm-debug.log*
 
 # environment variables
 .env
-.env.development
-.env.production
+.env.*
+.env*.local
 
 # macOS-specific files
 .DS_Store
 
 # generated types
 /.astro/
-
-node_modules
