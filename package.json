@@ -11,7 +11,7 @@
 		"url": "https://harshitbudhraja.com"
 	},
 	"scripts": {
-		"dev": "npx tinacms dev -c \"astro dev\"",
+		"dev": "concurrently \"npx tinacms dev\" \"astro dev\"",
 		"start": "astro dev",
 		"build": "export $(cat .env | xargs) && tinacms build && astro build",
 		"preview": "astro preview",
@@ -21,6 +21,7 @@
 		"@astrojs/rss": "^4.0.18",
 		"@astrojs/sitemap": "^3.7.3",
 		"astro": "^7.0.3",
+		"concurrently": "^10.0.3",
 		"prettier": "^3.9.1",
 		"prettier-plugin-astro": "^0.14.1"
 	},
