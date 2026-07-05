@@ -1,5 +1,5 @@
 import rss from "@astrojs/rss";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 import { title, subtitle } from "../settings/settings.json";
 
 let posts = await getCollection("posts");
@@ -10,22 +10,27 @@ posts = posts.sort(
 		new Date(a.data.updated || a.data.added).valueOf()
 );
 
-export const GET = () =>
-	rss({
+export const GET = async (context) => {
+	const items = await Promise.all(
+		posts.map(async (post) => {
+			const { Content } = await render(post);
+			return {
+				link: `${context.site}blog/${post.data.slug}/`,
+				title: post.data.title,
+				pubDate: new Date(post.data.added),
+				description: post.data.description,
+				customData: post.data.updated
+					? `<updated>${post.data.updated}</updated>`
+					: "",
+			};
+		})
+	);
+
+	return rss({
 		title: title || "",
 		description: subtitle || "",
-		site: import.meta.env.SITE,
-		items: posts.map((post) => {
-			return {
-				link: `/blog/${post.data.slug}`,
-				title: post.data.title,
-				pubDate: post.data.added,
-				description: post.data.description,
-				content: post.rendered.html,
-				customData: `<updated>${
-					post.data.updated ? post.data.updated : ""
-				}</updated>`,
-			};
-		}),
+		site: context.site,
+		items,
 		stylesheet: "/rss-styles.xsl",
 	});
+};
