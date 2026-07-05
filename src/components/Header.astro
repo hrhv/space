@@ -4,6 +4,9 @@ import { name, subtitle, social, photo } from "../settings/settings.json";
 ---
 
 <header>
+	<button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+		<span></span><span></span><span></span>
+	</button>
 	<div class="header-section">
 		<div class="header-frame">
 			<h1><a href="/">{name}</a></h1>
@@ -14,15 +17,37 @@ import { name, subtitle, social, photo } from "../settings/settings.json";
 		</div>
 	</div>
 </header>
+
 <nav>
-	<HeaderLink href="/">home</HeaderLink>
-	<HeaderLink href="/blog">blog</HeaderLink>
-	<HeaderLink href={social.github} target="_blank" rel="noopener noreferrer">github</HeaderLink>
-	<HeaderLink href={social.linkedin} target="_blank" rel="noopener noreferrer">linkedin</HeaderLink>
-	<HeaderLink href={social.twitter} target="_blank" rel="noopener noreferrer">x</HeaderLink>
-	<HeaderLink href={social.youtube} target="_blank" rel="noopener noreferrer">youtube</HeaderLink>
-	<HeaderLink href={social.bluesky} target="_blank" rel="noopener noreferrer">bluesky</HeaderLink>
+	<div class="nav-links">
+		<HeaderLink href="/">home</HeaderLink>
+		<HeaderLink href="/blog">blog</HeaderLink>
+		<HeaderLink href={social.github} target="_blank" rel="noopener noreferrer">github</HeaderLink>
+		<HeaderLink href={social.linkedin} target="_blank" rel="noopener noreferrer">linkedin</HeaderLink>
+		<HeaderLink href={social.twitter} target="_blank" rel="noopener noreferrer">x</HeaderLink>
+		<HeaderLink href={social.youtube} target="_blank" rel="noopener noreferrer">youtube</HeaderLink>
+		<HeaderLink href={social.bluesky} target="_blank" rel="noopener noreferrer">bluesky</HeaderLink>
+	</div>
 </nav>
+
+<script is:inline>
+	const toggle = document.querySelector('.nav-toggle');
+	const links  = document.querySelector('.nav-links');
+	if (toggle && links) {
+		toggle.addEventListener('click', () => {
+			const open = toggle.getAttribute('aria-expanded') === 'true';
+			toggle.setAttribute('aria-expanded', String(!open));
+			links.classList.toggle('open', !open);
+		});
+		links.querySelectorAll('a').forEach(a => {
+			a.addEventListener('click', () => {
+				toggle.setAttribute('aria-expanded', 'false');
+				links.classList.remove('open');
+			});
+		});
+	}
+</script>
+
 <style>
 	h1 a {
 		text-decoration: none;
@@ -36,6 +61,7 @@ import { name, subtitle, social, photo } from "../settings/settings.json";
 		border-radius: 50%;
 		width: 200px;
 		height: 200px;
+		min-width: 200px;
 		margin: 10px 0;
 		position: relative;
 		overflow: hidden;
@@ -46,5 +72,73 @@ import { name, subtitle, social, photo } from "../settings/settings.json";
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
+	}
+
+	/* ── Hamburger — hidden on desktop ── */
+	.nav-toggle {
+		display:        none;
+		background:     none;
+		border:         none;
+		cursor:         pointer;
+		padding:        8px 0;
+		flex-direction: column;
+		gap:            5px;
+	}
+	.nav-toggle span {
+		display:          block;
+		width:            22px;
+		height:           2px;
+		background-color: var(--fg);
+		transition:       transform 0.2s ease, opacity 0.2s ease;
+	}
+	.nav-toggle[aria-expanded="true"] span:nth-child(1) {
+		transform: translateY(7px) rotate(45deg);
+	}
+	.nav-toggle[aria-expanded="true"] span:nth-child(2) {
+		opacity: 0;
+	}
+	.nav-toggle[aria-expanded="true"] span:nth-child(3) {
+		transform: translateY(-7px) rotate(-45deg);
+	}
+
+	/* ── Nav links — desktop ── */
+	.nav-links {
+		display:         flex;
+		flex-wrap:       wrap;
+		justify-content: center;
+		margin-top: 20px;
+	}
+	.nav-links a {
+		margin:  10px 0;
+		padding: 0 12px 0 0;
+	}
+	.nav-links a:last-child {
+		padding: 0;
+	}
+
+	/* ── Mobile ── */
+	@media (max-width: 520px) {
+		.nav-toggle {
+			display: flex;
+		}
+		.img-frame {
+			width:     120px;
+			height:    120px;
+			min-width: 120px;
+		}
+		.nav-links {
+			display:        none;
+			flex-direction: column;
+			align-items:    flex-start;
+			padding:        8px 0 12px;
+		}
+		.nav-links.open {
+			display: flex;
+		}
+		.nav-links a {
+			margin:  0;
+			padding: 6px 0;
+			width:   100%;
+		}
 	}
 </style>
