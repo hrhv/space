@@ -1,12 +1,12 @@
 {
-	"name": "Harshit Budhraja",
-	"title": "Harshit Budhraja",
-	"subtitle": "Experimenting my way through & writing about a plethora of 'geeky' stuff — from open-source & JavaScript to APIs & Dark Web — product and engineering enthusiast 🚀",
-	"social": {
-		"github": "https://github.com/hrhv",
-		"linkedin": "https://linkedin.com/in/harshitbudhraja",
-		"twitter": "https://x.com/harshitbudhraja",
-		"youtube": "https://www.youtube.com/@prodengg",
-		"bluesky": "https://bsky.app/profile/harshitbudhraja.com"
-	}
+  "name": "Harshit Budhraja",
+  "title": "Harshit Budhraja",
+  "subtitle": "Experimenting my way through & writing about a plethora of 'geeky' stuff — from open-source & JavaScript to APIs & Dark Web — product and engineering enthusiast 🚀",
+  "social": {
+    "github": "https://github.com/hrhv",
+    "linkedin": "https://linkedin.com/in/harshitbudhraja",
+    "twitter": "https://x.com/harshitbudhraja",
+    "youtube": "",
+    "bluesky": ""
+  }
 }
