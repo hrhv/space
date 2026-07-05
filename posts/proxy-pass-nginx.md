@@ -4,6 +4,7 @@ slug: proxy-pass-nginx
 description: "A quick NGINX config snippet to proxy pass requests from port 80 to a custom port where your app is running."
 added: 2021-05-13
 tags: ["proxy", "nginx", "nanobits"]
+coverImage: /assets/proxy-pass-nginx-cover.png
 ---
 
 More than ever, if you're managing a server either as an EC2 instance on AWS, or as a VM instance on GCP, or just working on your local machines, proxying to your app's custom port comes in handy if:

@@ -6,6 +6,7 @@ tags:
   - mysql
   - databases
 added: 2019-11-22T00:00:00.000Z
+coverImage: /assets/mysqls-weird-way-of-strip-typecasting-strings-to-integers-cover.png
 ---
 
 > As much as we think we know MySQL, it never fails to surprise us with unusual and weird, yet well-documented, scenarios.

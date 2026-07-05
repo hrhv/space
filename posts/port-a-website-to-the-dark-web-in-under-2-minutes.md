@@ -4,6 +4,7 @@ slug: port-a-website-to-the-dark-web-in-under-2-minutes
 description: "What if I tell you that you can now host your own website on the tor network in less than 2 minutes?"
 added: 2021-05-27
 tags: ["docker", "nginx", "tor", "dark-web", "nanobits"]
+coverImage: /assets/port-a-website-to-the-dark-web-in-under-2-minutes-cover.png
 ---
 
 What if hosting a website on the dark web was as easy as running a tiny docker container in your own machines or a remote server or merely on your Raspberry Pi? What if I tell you that it actually is, and you can now host your own website on the Tor 🧅 network in less than 2 minutes? ⌛️
@@ -24,7 +25,7 @@ In NSS ("not-so-sophisticated") terms, this can be understood as a simple [proxy
 
 Of course! [IPOAlerts.in](https://ipoalerts.in), [a service which was built by me over a weekend](https://www.linkedin.com/posts/harshitbudhraja_ipoalert-trading-startupstory-activity-6787310217878110208-LnLI) last month, is now available over Tor 🎊 And it's using nothing more than `tor-nginx-proxy` behind-the-scenes. Here's a glance of my docker container which is serving it on Tor.
 
-![tor-nginx-proxy_container.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1622135951077/TWbEM-N4T.png)
+![tor-nginx-proxy_container.png](/assets/port-a-website-to-the-dark-web-in-under-2-minutes-1.png)
 
 Check it out on: `http://ipoaltnp5be3mvotgap2ohu62py5nyu25cg2uognl7u5kysqxsrezoad.onion/` using the [Tor Browser](https://www.torproject.org/download/).
 

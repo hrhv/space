@@ -4,6 +4,7 @@ slug: bigbaskets-first-step-towards-open-source
 description: "The story behind BigBasket's first open-source contribution — ra-treemenu, a React Admin tree menu package."
 added: 2021-03-17
 tags: ["opensource", "npm", "reactjs"]
+coverImage: /assets/bigbaskets-first-step-towards-open-source-cover.png
 ---
 
 ### The answer to “why?”
@@ -30,14 +31,14 @@ Soon after building the package, with the statistics that we had about React Adm
 
 And the rest is history! ☺️
 
-![ra-demo.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1620828387716/qijz1B1v_A.png)
+![ra-demo.png](/assets/bigbaskets-first-step-towards-open-source-1.png)
 
 ### What now?
 
 Since August ’20, when we made the package open source (https://github.com/BigBasket/ra-treemenu) and published the first version of it on NPM (https://www.npmjs.com/package/@bb-tech/ra-treemenu), we have had over 2400+ downloads with an average of about 10-12 downloads per day. We’ve released 4 versions till date which had decent contributions from the community as well. Here’s what it looks like:
 
 
-![image.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1620828401780/l3X2DgF8j.png)
+![image.png](/assets/bigbaskets-first-step-towards-open-source-2.png)
 
 Detailed stats: https://npm-stat.com/charts.html?package=%40bb-tech%2Fra-treemenu&from=2020-08-01&to=2021-03-17
 

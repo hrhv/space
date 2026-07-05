@@ -4,6 +4,7 @@ slug: types-of-apis-rest-vs-soap
 description: "A deep dive into REST and SOAP APIs — their structures, differences, and when to use each."
 added: 2023-04-13
 tags: ["rest-api", "soap-api", "apis"]
+coverImage: /assets/types-of-apis-rest-vs-soap-cover.png
 ---
 
 > Before we get into this, if you're new here or don't know me - I'm Harshit, and I'm a Software Engineer primarily working on Backend Systems. In my steep upward career of 3+ years, I've worked at two unicorns - BigBasket (**bigbasket.com**), India's Largest Online Grocery Supermarket and Postman ([**postman.com**](http://postman.com)), an API Development Platform which was my latest sprint.

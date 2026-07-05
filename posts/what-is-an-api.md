@@ -4,6 +4,7 @@ slug: what-is-an-api
 description: "Most modern software uses APIs — here's a simple breakdown of what they are, how they work, and what they look like."
 added: 2023-02-09
 tags: ["api", "apis", "api-basics"]
+coverImage: /assets/what-is-an-api-cover.png
 ---
 
 > Before we get into this, if you're new here or don't know me - I'm Harshit, and I'm a Software Engineer currently working at Postman (https://postman.com), an API Development Platform.
@@ -27,7 +28,7 @@ Breaking it down for you:
 3. **Interface** - Any tool/library/software/hardware that helps you complete your task (in this case, helps you program your apps).
     
 
-![](https://cdn.hashnode.com/res/hashnode/image/upload/v1675952113900/07bda8dc-255d-4bb4-96af-21b7684f2bc6.png)
+![](/assets/what-is-an-api-1.png)
 
 # Ah, that was a bouncer for me 🤯
 
@@ -43,7 +44,7 @@ The answer to this question is simple - from organizations that have satellites 
 
 Here's a little diagram to understand how this communication takes place:
 
-![](https://cdn.hashnode.com/res/hashnode/image/upload/v1675953991948/5b77925e-848e-4b14-94bc-568b613170b0.png)
+![](/assets/what-is-an-api-2.png)
 
 Satellites owned by meteorological organizations relay the weather data to them, who in turn relay this to the requesting companies - like Samsung, and they further make this data available to their users on their smartphones.
 

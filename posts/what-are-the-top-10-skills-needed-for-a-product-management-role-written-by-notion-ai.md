@@ -4,6 +4,7 @@ slug: what-are-the-top-10-skills-needed-for-a-product-management-role-written-by
 description: "A blog post generated entirely by Notion AI about the top 10 skills needed for a Product Management role."
 added: 2022-12-29
 tags: ["ai", "notion", "notionai"]
+coverImage: /assets/what-are-the-top-10-skills-needed-for-a-product-management-role-written-by-notion-ai-cover.png
 ---
 
 > So, I recently got access to the feature everyone is talking about these days - Notion's AI Assistant. And I decided to give it a try.

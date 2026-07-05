@@ -8,7 +8,7 @@ tags:
   - nginx-proxy-manager
   - dokploy
 added: 2026-05-23T00:00:00.000Z
-coverImage: /assets/2c62aa07-7b50-4b58-a720-66c496454606.webp
+coverImage: /assets/my-proxmox-homelab-kept-freezing-every-few-hours-cover.webp
 ---
 
 I run a small homelab on an Intel NUC — Proxmox as the hypervisor, a couple of VMs handling things like Jellyfin, AdGuard, Nginx Proxy Manager, and Dokploy. Nothing fancy, but it's always on and I rely on it.

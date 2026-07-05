@@ -6,6 +6,7 @@ tags:
   - engineering
   - architecture
 added: 2019-09-13T00:00:00.000Z
+coverImage: /assets/making-apt-decisions-while-you-code-to-save-money-cover.png
 ---
 
 It’s fairly common to find students coding all through their college and I was one of the lot — played around with a lot of code, services, APIs, hooks, bots and what not. I used to be confident that I’m pretty good at what I do, until now when stepping out of that confined water bucket into the ocean made me realise that I’m not at par with practices adopted by the industry. And one of the most underrated yet essential aspect of product design is **making apt decisions**, which I’m going to talk about in this post.
@@ -14,7 +15,7 @@ Let me make my point with the help of a small example.
 
 Let’s say we have an architecture like -
 
-![Example architecture](https://cdn.hashnode.com/res/hashnode/image/upload/v1620820617262/lEqSMla3-.png "Example Architecture")
+![Example architecture](/assets/making-apt-decisions-while-you-code-to-save-money-1.png "Example Architecture")
 
 Assuming that each replica of the codebase can do only one job at a time and it takes ‘t’ time for one replica to complete one task, only after which can it take up the next one, consider -
 

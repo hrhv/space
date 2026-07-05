@@ -4,6 +4,7 @@ slug: generating-vanity-onion-addresses-for-tor-v3-hidden-services
 description: "How to generate custom vanity .onion addresses for Tor v3 hidden services using Docker and mkp224o."
 added: 2023-02-13
 tags: ["tor", "dark-web", "onion", "nanobits"]
+coverImage: /assets/generating-vanity-onion-addresses-for-tor-v3-hidden-services-cover.png
 ---
 
 [**ED25519**](https://ed25519.cr.yp.to) (formerly, Proposal 224) is a public-key signature system that is now being adopted by Tor v3 hidden services. As per [Tor's official statement on its blog](https://blog.torproject.org/v2-deprecation-timeline), v2, which relies on older systems of public-key signatures, will be completely deprecated and removed by October 2021.
@@ -24,7 +25,7 @@ docker run -it nwtgck/mkp224o
 
 Once you're in, `mkp224o` will be available to you as an executable. You can check out the usage and options by running `mkp224o -h` to see a help text like this:
 
-![image.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1621417878298/hRpevwX6D.png)
+![image.png](/assets/generating-vanity-onion-addresses-for-tor-v3-hidden-services-1.png)
 
 ## Need a quick-start command to begin with, eh?
 
@@ -47,7 +48,7 @@ mkp224o -B -S 1 -d onions -n 2 temp
 
 And voila, we now have them in the specified directory:
 
-![image.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1621417972524/0HCLtPVym.png)
+![image.png](/assets/generating-vanity-onion-addresses-for-tor-v3-hidden-services-2.png)
 
 You can find the public key, secret key and a hostname file for each .onion that you've generated.
 
