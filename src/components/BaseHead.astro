@@ -8,6 +8,13 @@ const { title, description, image = "/home-blog-card.png" } = Astro.props;
 ---
 
 <head>
+	<!-- Dark mode: apply before paint to avoid flash -->
+	<script is:inline>
+		if (localStorage.getItem('theme') === 'dark') {
+			document.documentElement.classList.add('dark');
+		}
+	</script>
+
 	<!-- Global Metadata -->
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width,initial-scale=1" />
