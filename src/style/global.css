@@ -231,7 +231,7 @@ h3 {
 }
 
 .header-frame {
-	max-width: 350px;
+	width: 350px;
 }
 
 article :not(.article-title) {

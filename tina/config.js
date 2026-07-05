@@ -53,6 +53,11 @@ export default defineConfig({
 							{ type: "string", label: "Bluesky", name: "bluesky" },
 						],
 					},
+					{
+						type: "string",
+						label: "Photo",
+						name: "photo",
+					},
 				],
 				ui: {
 					allowedActions: {

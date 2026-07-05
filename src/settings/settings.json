@@ -1,12 +1,13 @@
 {
+  "photo": "https://pbs.twimg.com/profile_images/2057517107093663744/3OCVTNNG_400x400.jpg",
   "name": "Harshit Budhraja",
   "title": "Harshit Budhraja",
-  "subtitle": "Experimenting my way through & writing about a plethora of 'geeky' stuff — from open-source & JavaScript to APIs & Dark Web — product and engineering enthusiast 🚀",
+  "subtitle": "Software Engineer based in India 🇮🇳",
   "social": {
     "github": "https://github.com/hrhv",
     "linkedin": "https://linkedin.com/in/harshitbudhraja",
     "twitter": "https://x.com/harshitbudhraja",
-    "youtube": "",
-    "bluesky": ""
+    "youtube": "https://youtube.com/@prodengg",
+    "bluesky": "https://bsky.app/profile/harshitbudhraja.com"
   }
 }

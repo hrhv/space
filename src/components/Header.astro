@@ -1,16 +1,16 @@
 ---
 import HeaderLink from "./HeaderLink.astro";
-import { name, subtitle, social } from "../settings/settings.json";
-
+import { name, subtitle, social, photo } from "../settings/settings.json";
 ---
 
 <header>
 	<div class="header-section">
 		<div class="header-frame">
-			<!-- TODO: replace {{PHOTO_PATH}} with actual photo once available -->
-			<!-- <img src="{{PHOTO_PATH}}" alt={name} class="avatar" /> -->
 			<h1><a href="/">{name}</a></h1>
 			<h2>{subtitle}</h2>
+		</div>
+		<div class="img-frame">
+			<img id="propic" src={photo} alt={`${name}'s photo`} />
 		</div>
 	</div>
 </header>
@@ -30,5 +30,21 @@ import { name, subtitle, social } from "../settings/settings.json";
 	}
 	h2 {
 		margin: 0.5em 0;
+		white-space: pre-wrap;
+	}
+	.img-frame {
+		border-radius: 50%;
+		width: 200px;
+		height: 200px;
+		margin: 10px 0;
+		position: relative;
+		overflow: hidden;
+	}
+	.img-frame img {
+		height: 100%;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
 	}
 </style>
