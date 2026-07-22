@@ -40,6 +40,9 @@
 			localStorage.setItem("theme", next);
 			syncToggleLabel();
 			paintLinkColors();
+			if (typeof umami !== "undefined") {
+				umami.track("theme-toggle", { theme: next });
+			}
 		});
 	}
 

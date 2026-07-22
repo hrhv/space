@@ -24,7 +24,7 @@ const posts = await getCollection("posts");
 				<p>
 					Hello! I'm {name.split(' ')[0]}, and I like to code, write, and talk about tech.
 					<br /><br />
-					Currently, I work as a Software Engineer at <a href="https://imagekit.io">ImageKit</a>, where I build scalable and performant media processing and delivery systems. Outside of work, I'm an active open source-er, a public speaker, a homelab-tinkerer, a solopreneur, and a bit of a minimalist. I enjoy building micro-SaaS products, playing musical instruments (and occasionally, singing), hanging out with my family and friends, and biking around the city in my free time.
+					Currently, I work as a Software Engineer at <a href="https://imagekit.io" data-umami-event="bio-imagekit">ImageKit</a>, where I build scalable and performant media processing and delivery systems. Outside of work, I'm an active open source-er, a public speaker, a homelab-tinkerer, a solopreneur, and a bit of a minimalist. I enjoy building micro-SaaS products, playing musical instruments (and occasionally, singing), hanging out with my family and friends, and biking around the city in my free time.
 				</p>
 
 				<p>
@@ -39,9 +39,9 @@ const posts = await getCollection("posts");
 			<HomePosts allPosts={posts} />
 
 			<p class="center">
-				<a href="/blog">all posts →</a>
+				<a href="/blog" data-umami-event="all-posts">all posts →</a>
 				&nbsp;&nbsp;
-				<a href="/rss.xml">subscribe via rss</a>
+				<a href="/rss.xml" data-umami-event="subscribe-rss">subscribe via rss</a>
 			</p>
 		</main>
 		<Footer />

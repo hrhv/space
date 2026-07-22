@@ -20,13 +20,13 @@ import { name, subtitle, social, photo } from "../settings/settings.json";
 
 <nav>
 	<div class="nav-links">
-		<HeaderLink href="/">home</HeaderLink>
-		<HeaderLink href="/blog">blog</HeaderLink>
-		<HeaderLink href={social.github} target="_blank" rel="noopener noreferrer">github</HeaderLink>
-		<HeaderLink href={social.linkedin} target="_blank" rel="noopener noreferrer">linkedin</HeaderLink>
-		<HeaderLink href={social.twitter} target="_blank" rel="noopener noreferrer">x</HeaderLink>
-		<HeaderLink href={social.youtube} target="_blank" rel="noopener noreferrer">youtube</HeaderLink>
-		<HeaderLink href={social.bluesky} target="_blank" rel="noopener noreferrer">bluesky</HeaderLink>
+		<HeaderLink href="/" data-umami-event="nav-home">home</HeaderLink>
+		<HeaderLink href="/blog" data-umami-event="nav-blog">blog</HeaderLink>
+		<HeaderLink href={social.github} target="_blank" rel="noopener noreferrer" data-umami-event="nav-github">github</HeaderLink>
+		<HeaderLink href={social.linkedin} target="_blank" rel="noopener noreferrer" data-umami-event="nav-linkedin">linkedin</HeaderLink>
+		<HeaderLink href={social.twitter} target="_blank" rel="noopener noreferrer" data-umami-event="nav-x">x</HeaderLink>
+		<HeaderLink href={social.youtube} target="_blank" rel="noopener noreferrer" data-umami-event="nav-youtube">youtube</HeaderLink>
+		<HeaderLink href={social.bluesky} target="_blank" rel="noopener noreferrer" data-umami-event="nav-bluesky">bluesky</HeaderLink>
 	</div>
 </nav>
 
