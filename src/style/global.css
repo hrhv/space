@@ -226,7 +226,28 @@ content {
 	line-height: 1.6;
 }
 table {
-	width: 100%;
+	width:           100%;
+	border-collapse: collapse;
+	font-size:       0.9em;
+	margin:          1em 0;
+}
+
+th,
+td {
+	border:         1px solid var(--gray);
+	padding:        0.5em 0.75em;
+	text-align:     left;
+	vertical-align: top;
+}
+
+th {
+	font-weight: bold;
+	color:       var(--fg);
+	background:  var(--code-bg);
+}
+
+tr:nth-child(even) td {
+	background: var(--code-bg);
 }
 img {
 	max-width: 100%;
