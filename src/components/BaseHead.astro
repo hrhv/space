@@ -4,7 +4,12 @@ import "../style/global.css";
 
 import { name, title as SITE_TITLE } from "../settings/settings.json"
 
-const { title, description, image = "/home-blog-card.png" } = Astro.props;
+const {
+	title,
+	description,
+	image = "/home-blog-card.png",
+	favicon = "/favicon.ico",
+} = Astro.props;
 ---
 
 <head>
@@ -18,7 +23,7 @@ const { title, description, image = "/home-blog-card.png" } = Astro.props;
 	<!-- Global Metadata -->
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width,initial-scale=1" />
-	<link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+	<link rel="icon" href={favicon} />
 	<meta name="generator" content={Astro.generator} />
 
 	<!-- Google Site Verification — TODO: replace with actual token -->

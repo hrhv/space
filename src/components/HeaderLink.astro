@@ -1,11 +1,19 @@
 ---
-const { href, class: className, ...props } = Astro.props;
+const { href, exact = false, class: className, ...props } = Astro.props;
+
+// Compare without trailing slashes so "/projects/tiku" and "/projects/tiku/"
+// match. `exact` keeps a section's home link from staying active on all of
+// the section's sub-pages.
+const trim = (path) => path.replace(/\/+$/, "") || "/";
+const current = trim(Astro.url.pathname);
+const target = trim(href);
+
 let isActive;
 
-if (href === "/") {
-	isActive = Astro.url.pathname === href;
+if (target === "/" || exact) {
+	isActive = current === target;
 } else {
-	isActive = Astro.url.pathname.startsWith(href);
+	isActive = current === target || current.startsWith(`${target}/`);
 }
 
 ---

@@ -1,6 +1,30 @@
 ---
 import HeaderLink from "./HeaderLink.astro";
 import { name, subtitle, social, photo } from "../settings/settings.json";
+
+// With no props this is the site header. Project pages pass their own
+// identity and navbar (see layouts/ProjectLayout.astro).
+const {
+	heading = name,
+	subheading = subtitle,
+	href = "/",
+	image = photo,
+	imageAlt = `${name}'s photo`,
+	// "circle" crops a photo; "square" shows a logo as-is.
+	imageShape = "circle",
+	links = [
+		{ href: "/", label: "home", event: "nav-home" },
+		{ href: "/blog", label: "blog", event: "nav-blog" },
+		{ href: social.github, label: "github", event: "nav-github" },
+		{ href: social.linkedin, label: "linkedin", event: "nav-linkedin" },
+		{ href: social.twitter, label: "x", event: "nav-x" },
+		{ href: social.youtube, label: "youtube", event: "nav-youtube" },
+		{ href: social.bluesky, label: "bluesky", event: "nav-bluesky" },
+	],
+} = Astro.props;
+
+const external = { target: "_blank", rel: "noopener noreferrer" };
+const isExternal = (url) => /^https?:\/\//.test(url);
 ---
 
 <header>
@@ -9,24 +33,30 @@ import { name, subtitle, social, photo } from "../settings/settings.json";
 	</button>
 	<div class="header-section">
 		<div class="header-frame">
-			<h1><a href="/">{name}</a></h1>
-			<h2>{subtitle}</h2>
+			<slot name="eyebrow" />
+			<h1><a href={href}>{heading}</a></h1>
+			<h2>{subheading}</h2>
 		</div>
-		<div class="img-frame">
-			<img id="propic" src={photo} alt={`${name}'s photo`} />
+		<div class:list={["img-frame", imageShape]}>
+			<img id="propic" src={image} alt={imageAlt} />
 		</div>
 	</div>
 </header>
 
 <nav>
 	<div class="nav-links">
-		<HeaderLink href="/" data-umami-event="nav-home">home</HeaderLink>
-		<HeaderLink href="/blog" data-umami-event="nav-blog">blog</HeaderLink>
-		<HeaderLink href={social.github} target="_blank" rel="noopener noreferrer" data-umami-event="nav-github">github</HeaderLink>
-		<HeaderLink href={social.linkedin} target="_blank" rel="noopener noreferrer" data-umami-event="nav-linkedin">linkedin</HeaderLink>
-		<HeaderLink href={social.twitter} target="_blank" rel="noopener noreferrer" data-umami-event="nav-x">x</HeaderLink>
-		<HeaderLink href={social.youtube} target="_blank" rel="noopener noreferrer" data-umami-event="nav-youtube">youtube</HeaderLink>
-		<HeaderLink href={social.bluesky} target="_blank" rel="noopener noreferrer" data-umami-event="nav-bluesky">bluesky</HeaderLink>
+		{
+			links.map(({ href, label, event, exact }) => (
+				<HeaderLink
+					href={href}
+					exact={exact}
+					data-umami-event={event}
+					{...(isExternal(href) ? external : {})}
+				>
+					{label}
+				</HeaderLink>
+			))
+		}
 	</div>
 </nav>
 
@@ -72,6 +102,10 @@ import { name, subtitle, social, photo } from "../settings/settings.json";
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
+	}
+	.img-frame.square {
+		border-radius: 0;
+		overflow: visible;
 	}
 
 	/* ── Hamburger — hidden on desktop ── */

@@ -1,0 +1,93 @@
+---
+/**
+ * Template for every page under /projects/<id>/: a project's homepage, its
+ * legal pages, docs, anything else.
+ *
+ * It swaps the site header for a project-branded one (logo, name, tagline
+ * and the project's own navbar) and keeps the rest of the site (fonts,
+ * colours, footer, dark mode), so every project looks like it belongs here.
+ * What goes inside is entirely up to the page:
+ *
+ *   <ProjectLayout project="tiku" title="Changelog" description="…">
+ *     …anything…
+ *   </ProjectLayout>
+ *
+ * `project` is the name of a file in /projects. Long-form markdown pages
+ * should use ProjectArticle.astro, which wraps this layout.
+ */
+import { getEntry } from "astro:content";
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import ColorScript from "../components/ColorScript.astro";
+import { name as SITE_NAME } from "../settings/settings.json";
+
+// Also usable directly as a markdown `layout:`, with frontmatter as props.
+const { project: id, title, description, image } =
+	Astro.props.frontmatter ?? Astro.props;
+
+const entry = await getEntry("projects", id);
+
+if (!entry) {
+	throw new Error(`Unknown project "${id}": add projects/${id}.json`);
+}
+
+const project = entry.data;
+const home = `/projects/${entry.id}/`;
+const slugify = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+const links = [
+	{ href: home, label: project.name.toLowerCase(), exact: true, event: "home" },
+	...project.nav,
+].map((link) => ({
+	...link,
+	event: `${entry.id}-nav-${link.event ?? slugify(link.label)}`,
+}));
+---
+
+<!doctype html>
+<html lang="en-us">
+	<BaseHead
+		title={title ? `${title} — ${project.name}` : `${project.name} — ${SITE_NAME}`}
+		description={description ?? project.description}
+		image={image ?? project.logo}
+		favicon={project.favicon ?? project.logo}
+	/>
+	<body>
+		<Header
+			heading={project.name}
+			subheading={project.tagline}
+			href={home}
+			image={project.logo}
+			imageAlt={`${project.name} logo`}
+			imageShape="square"
+			links={links}
+		>
+			<p slot="eyebrow" class="breadcrumb">
+				<a href="/" data-umami-event={`${entry.id}-breadcrumb-home`}>{SITE_NAME.toLowerCase()}</a>
+				/
+				<a href="/projects/" data-umami-event={`${entry.id}-breadcrumb-projects`}>projects</a>
+				/
+			</p>
+		</Header>
+		<main>
+			<slot />
+		</main>
+		<Footer />
+		<ColorScript />
+	</body>
+</html>
+
+<style>
+	.breadcrumb {
+		margin:    0;
+		font-size: 0.8rem;
+		color:     var(--gray);
+	}
+	.breadcrumb a {
+		color: inherit;
+	}
+	.breadcrumb a:hover {
+		color: var(--fg);
+	}
+</style>

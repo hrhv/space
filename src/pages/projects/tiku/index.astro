@@ -1,0 +1,154 @@
+---
+import ProjectLayout from "../../../layouts/ProjectLayout.astro";
+import ProjectFacts from "../../../components/projects/ProjectFacts.astro";
+import ProjectFact from "../../../components/projects/ProjectFact.astro";
+
+// Plain ASCII on purpose: box-drawing glyphs aren't in the font's latin
+// subset and would fall back to another font, breaking the alignment.
+const diagram = ` me + my people              me
+        |                     |
+  +-----v-----+         +-----v-----+
+  |  telegram |         |  discord  |
+  |  the work |         | the fixes |
+  +-----+-----+         +-----+-----+
+        |                     |
+        +----------+----------+
+                   |
+      +------------v------------+
+      |           tiku          |
+      |  built on hermes agent  |
+      |  remembers with honcho  |
+      +-------------------------+
+      |   an lxc container on   |
+      |  proxmox, in my homelab |
+      +-------------------------+`;
+---
+
+<ProjectLayout project="tiku">
+	<section class="intro">
+		<p>
+			Tiku is my personal AI assistant. I built it for myself and a handful of
+			close friends and family, to take care of the small stuff that's easy to
+			drop: the email that needed a reply last week, the task I said I'd do
+			"tomorrow", and the odd bit of work I'd rather hand off.
+		</p>
+		<p>
+			It isn't a product, and it isn't open to the public. If you're reading
+			this, you probably got the link from me. 👋
+		</p>
+	</section>
+
+	<ProjectFacts>
+		<ProjectFact label="built on">
+			<a href="https://hermes-agent.nousresearch.com/" data-umami-event="tiku-hermes">Hermes Agent</a>, by Nous Research
+		</ProjectFact>
+		<ProjectFact label="memory">
+			<a href="https://honcho.dev/" data-umami-event="tiku-honcho">Honcho</a>, by Plastic Labs
+		</ProjectFact>
+		<ProjectFact label="runs on">
+			an LXC container on Proxmox, in my <a href="/blog/my-proxmox-homelab-kept-freezing-every-few-hours" data-umami-event="tiku-homelab">homelab</a>
+		</ProjectFact>
+		<ProjectFact label="talks on">Telegram & Discord</ProjectFact>
+		<ProjectFact label="made for">me, friends & family</ProjectFact>
+		<ProjectFact label="status">live, invite-only</ProjectFact>
+	</ProjectFacts>
+
+	<h2>How it's set up</h2>
+
+	<p>
+		Tiku is built on <a href="https://hermes-agent.nousresearch.com/">Hermes Agent</a>,
+		the open-source agent from Nous Research. Hermes does the heavy lifting
+		(tools, skills, scheduled jobs, and the gateway that connects it to chat
+		apps), and Tiku is my own setup of it.
+	</p>
+	<p>
+		For memory, it uses <a href="https://honcho.dev/">Honcho</a>. Instead of
+		starting from scratch every time, Tiku remembers context across
+		conversations and slowly builds an understanding of each person it talks
+		to: what they're working on, and how they like things done.
+	</p>
+	<p>
+		All of it runs in an LXC container on the Proxmox server in my homelab,
+		on hardware that sits at home with me.
+	</p>
+
+	<pre
+		class="diagram"
+		role="img"
+		aria-label="Telegram and Discord both connect to Tiku, which is built on Hermes Agent, uses Honcho for memory, and runs in an LXC container on Proxmox in a homelab."
+	>{diagram}</pre>
+
+	<h2>Where it lives</h2>
+
+	<p>
+		<strong>Telegram is where the real work happens.</strong> That's where Tiku
+		nudges me about emails that need attention, reminds me of tasks I've
+		forgotten about, and picks up whatever I throw at it on demand.
+	</p>
+	<p>
+		<strong>Discord is the workshop.</strong> It's where Tiku's development
+		happens: bugs, rough edges, and anything I need to fix on the bot.
+	</p>
+
+	<h2>What it does</h2>
+
+	<ul>
+		<li>
+			<strong>Email nudges.</strong> Keeps an eye on the inbox and pings me
+			when something needs a reply, before it goes stale.
+		</li>
+		<li>
+			<strong>Forgotten-task nudges.</strong> Brings back the things I meant
+			to do before they slip through the cracks.
+		</li>
+		<li>
+			<strong>On-demand work.</strong> Whatever I ask for in the moment, from
+			looking something up to drafting a message.
+		</li>
+	</ul>
+
+	<h2>Using Tiku</h2>
+
+	<p>
+		Tiku is invite-only, for friends and family. If that's you and you'd like
+		access, just ask me.
+	</p>
+	<p>
+		Using Tiku means you agree to its
+		<a href="/projects/tiku/terms-of-service/">terms of service</a> and
+		<a href="/projects/tiku/privacy-policy/">privacy policy</a>. I've written
+		both to be readable: they cover what Tiku does with your messages, who
+		else is involved, and how to get your data deleted. Questions? Write to
+		<a href="mailto:hello@harshitbudhraja.com">hello@harshitbudhraja.com</a>.
+	</p>
+</ProjectLayout>
+
+<style>
+	.intro {
+		margin: 2rem 0;
+	}
+
+	p,
+	li {
+		font-size:   1.05rem;
+		line-height: 1.7;
+	}
+
+	li + li {
+		margin-top: 0.5rem;
+	}
+
+	h2 {
+		margin-top: 2.5rem;
+	}
+
+	/* Scales down on small screens so all 37 columns fit, no scrolling. */
+	.diagram {
+		margin:           1.5rem 0;
+		padding:          1rem 0.75rem;
+		background-color: var(--code-bg);
+		border-radius:    4px;
+		font-size:        min(0.8rem, 2.9vw);
+		line-height:      1.35;
+	}
+</style>

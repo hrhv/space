@@ -1,0 +1,89 @@
+---
+/**
+ * Long-form page inside a project (legal pages, docs, changelogs), meant to
+ * be used as a markdown `layout:`. Frontmatter:
+ *
+ *   project      name of a file in /projects     required
+ *   title        page title                      required
+ *   description  meta description                optional
+ *   added        first published                 optional
+ *   updated      last changed                    optional
+ *   toc          true lists the page's h2s       optional
+ */
+import ProjectLayout from "./ProjectLayout.astro";
+
+const { frontmatter = Astro.props, headings = [] } = Astro.props;
+const { project, title, description, image, added, updated, toc } = frontmatter;
+
+const lastChanged = updated ?? added;
+const contents = toc ? headings.filter(({ depth }) => depth === 2) : [];
+
+const formatDate = (date) =>
+	new Date(date).toLocaleDateString("en-us", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+		timeZone: "UTC",
+	});
+---
+
+<ProjectLayout project={project} title={title} description={description} image={image}>
+	<article>
+		<h1 class="article-title">{title}</h1>
+		{
+			lastChanged && (
+				<span>
+					last updated on{" "}
+					<time datetime={new Date(lastChanged).toISOString()}>
+						{formatDate(lastChanged)}
+					</time>
+				</span>
+			)
+		}
+		{
+			contents.length > 0 && (
+				<div class="contents">
+					<p>contents</p>
+					<ul>
+						{contents.map(({ slug, text }) => (
+							<li>
+								<a href={`#${slug}`}>{text}</a>
+							</li>
+						))}
+					</ul>
+				</div>
+			)
+		}
+		<hr />
+		<div class="blog-post">
+			<slot />
+		</div>
+	</article>
+</ProjectLayout>
+
+<style>
+	.contents {
+		margin:    1.5rem 0 1rem;
+		font-size: 0.9rem;
+	}
+	.contents p {
+		margin: 0 0 0.25rem;
+		color:  var(--gray);
+	}
+	.contents ul {
+		margin:          0;
+		padding:         0;
+		list-style-type: none;
+		columns:         2;
+		column-gap:      2rem;
+	}
+	.contents li {
+		break-inside: avoid;
+	}
+
+	@media (max-width: 520px) {
+		.contents ul {
+			columns: 1;
+		}
+	}
+</style>

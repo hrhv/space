@@ -1,0 +1,32 @@
+---
+/**
+ * "At a glance" box for a project page. Fill it with ProjectFact rows:
+ *
+ *   <ProjectFacts>
+ *     <ProjectFact label="built on"><a href="…">Astro</a></ProjectFact>
+ *     <ProjectFact label="status">live</ProjectFact>
+ *   </ProjectFacts>
+ */
+---
+
+<dl class="facts">
+	<slot />
+</dl>
+
+<style>
+	.facts {
+		display:               grid;
+		grid-template-columns: max-content 1fr;
+		gap:                   0.35rem 1.5rem;
+		margin:                2rem 0;
+		padding:               1rem 1.25rem;
+		border:                1px solid var(--gray);
+	}
+
+	@media (max-width: 520px) {
+		.facts {
+			grid-template-columns: 1fr;
+			gap:                   0;
+		}
+	}
+</style>

@@ -1,0 +1,12 @@
+{
+  "name": "Tiku",
+  "tagline": "A personal AI assistant for me and my close ones",
+  "description": "Tiku is a personal AI assistant that I built on Hermes Agent for friends and family. It runs in a homelab and lives on Telegram and Discord.",
+  "logo": "/assets/projects/tiku/logo.png",
+  "favicon": "/assets/projects/tiku/favicon.png",
+  "added": "2026-10-13",
+  "nav": [
+    { "label": "terms of service", "href": "/projects/tiku/terms-of-service/" },
+    { "label": "privacy policy", "href": "/projects/tiku/privacy-policy/" }
+  ]
+}

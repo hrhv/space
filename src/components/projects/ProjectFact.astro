@@ -1,0 +1,22 @@
+---
+// One row of ProjectFacts. The slot can hold anything: text, links, lists.
+const { label } = Astro.props;
+---
+
+<dt>{label}</dt>
+<dd><slot /></dd>
+
+<style>
+	dt {
+		color: var(--gray);
+	}
+	dd {
+		margin: 0;
+	}
+
+	@media (max-width: 520px) {
+		dt:not(:first-of-type) {
+			margin-top: 0.6rem;
+		}
+	}
+</style>

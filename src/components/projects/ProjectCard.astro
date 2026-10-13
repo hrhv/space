@@ -1,0 +1,36 @@
+---
+// A project in the /projects list, laid out like a post in the blog list.
+const { id, name, tagline, description, logo } = Astro.props;
+const href = `/projects/${id}/`;
+---
+
+<li class="post project">
+	<a href={href} class="logo" tabindex="-1" aria-hidden="true">
+		<img src={logo} alt="" width="72" height="72" loading="lazy" />
+	</a>
+	<div>
+		<a href={href} class="title" data-umami-event={`projects-${id}`}>{name}</a>
+		<br />
+		<span class="tagline">{tagline}</span>
+		<p class="excerpt">{description}</p>
+	</div>
+</li>
+
+<style>
+	.project {
+		display: flex;
+		gap:     1.25rem;
+	}
+	.logo {
+		flex-shrink: 0;
+	}
+	.logo img {
+		display: block;
+	}
+	.tagline {
+		color: var(--gray);
+	}
+	.excerpt {
+		margin: 0.5rem 0 0;
+	}
+</style>
