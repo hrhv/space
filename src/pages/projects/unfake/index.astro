@@ -1,0 +1,195 @@
+---
+import ProjectLayout from "../../../layouts/ProjectLayout.astro";
+import ProjectFacts from "../../../components/projects/ProjectFacts.astro";
+import ProjectFact from "../../../components/projects/ProjectFact.astro";
+
+// Plain ASCII on purpose: box-drawing glyphs aren't in the font's latin
+// subset and would fall back to another font, breaking the alignment.
+const diagram = `      someone signs up with
+    totovo342@mailinator.com
+                |
+   +------------v------------+
+   |     your signup form    |
+   +------------+------------+
+                |  GET /check/:email
+   +------------v------------+
+   |          unfake         |
+   |   disposable?  alias?   |
+   |    role account?  mx?   |
+   |     public provider?    |
+   +------------+------------+
+                |
+        +-------+-------+
+        |               |
+  allowed: true   allowed: false
+   let them in      stop them`;
+---
+
+<ProjectLayout project="unfake">
+	<section class="intro">
+		<p>
+			Unfake is an API that tells you whether an email address is disposable
+			before it gets into your product. One request, and you know whether
+			<code>totovo342@mailinator.com</code> is a real person or an inbox that
+			will be gone in ten minutes.
+		</p>
+		<p>
+			I launched it in January 2025 to fix a problem I had on
+			<a href="/projects/ipoalerts/" data-umami-event="unfake-ipoalerts">ipoalerts</a>,
+			and these days it screens signups there and on a few other websites.
+		</p>
+	</section>
+
+	<ProjectFacts>
+		<ProjectFact label="what">an API that spots disposable and temporary emails</ProjectFact>
+		<ProjectFact label="checks">
+			disposable domains, role accounts, aliases, public providers & MX records
+		</ProjectFact>
+		<ProjectFact label="database">
+			200,000+ disposable domains, updated every few minutes
+		</ProjectFact>
+		<ProjectFact label="used by">
+			<a href="/projects/ipoalerts/" data-umami-event="unfake-fact-ipoalerts">ipoalerts</a>
+			&
+			a few other websites
+		</ProjectFact>
+		<ProjectFact label="since">January 2025</ProjectFact>
+		<ProjectFact label="status">live</ProjectFact>
+	</ProjectFacts>
+
+	<h2>Why I built it</h2>
+
+	<p>
+		As ipoalerts grew, so did a less exciting number: a big share of new
+		signups came from disposable, temporary inboxes. They cluttered the user
+		data, used up resources meant for real users, and made it cheap to game
+		the free tier. In October 2024, I caught one person creating account after
+		account just to stack up free API keys and run a round-robin.
+	</p>
+	<p>
+		This isn't a small-site problem; Facebook and Twitter have fought fake
+		signups for years. Open-source blocklists exist, but they're only as fresh
+		as their last update, and new throwaway domains show up <strong>every hour</strong>. I
+		wanted something I could call from a signup form and trust, so I built
+		Unfake and put it in front of ipoalerts' signups.
+	</p>
+	<p>
+		Every product with a signup form has the same problem, so I built it as
+		a product anyone can use, not just a patch for ipoalerts.
+	</p>
+
+	<h2>How it works</h2>
+
+	<p>
+		Send an email address or a domain to <code>GET /check/:input</code>, and
+		Unfake runs it through five checks:
+	</p>
+
+	<ul>
+		<li>
+			<strong>Disposable.</strong> Is the domain on the list of 200,000+ known
+			throwaway domains, from providers like mailinator.com, yopmail.com and
+			temp-mail.org?
+		</li>
+		<li>
+			<strong>Role account.</strong> Is it a shared inbox such as
+			<code>admin@</code> or <code>support@</code>?
+		</li>
+		<li>
+			<strong>Alias.</strong> Does it use plus addressing, like
+			<code>name+test@</code>?
+		</li>
+		<li>
+			<strong>Public provider.</strong> Is it a free inbox from Gmail, Hotmail
+			and the like?
+		</li>
+		<li>
+			<strong>MX records.</strong> Can the domain receive email at all?
+		</li>
+	</ul>
+
+	<pre
+		class="diagram"
+		role="img"
+		aria-label="Someone signs up with a mailinator.com address. Your signup form calls Unfake's check endpoint, which checks whether the address is disposable, an alias, a role account, a public provider, or has no MX records, and answers allowed true to let them in or allowed false to stop them."
+	>{diagram}</pre>
+
+	<p>
+		You decide which checks count. Out of the box, Unfake only blocks
+		disposable addresses, and every other check can be switched on per
+		request. A B2B app can turn away gmail.com, while a consumer app lets it
+		straight through. The response has a single <code>allowed</code> field for
+		the common case, and the result of every check for when you want the
+		details.
+	</p>
+
+	<h2>Where it is today</h2>
+
+	<p>
+		Unfake is live. Besides ipoalerts, it guards signups on a few other websites.
+	</p>
+	<p>
+		The database tracks over 200,000 disposable domains and is updated every
+		few minutes. Users report new throwaway providers almost every day, and
+		scripts fold them in. For bigger setups, there are custom rules per API
+		key, your own allow and block lists, and bulk checks of up to 50,000
+		emails at a time.
+	</p>
+	<p>There are also a few free tools on the site:</p>
+
+	<ul>
+		<li>
+			<a href="https://unfake.dev/validate-email" data-umami-event="unfake-validate-email">Email address validator</a>,
+			to check a single address.
+		</li>
+		<li>
+			<a href="https://unfake.dev/clean-email-lists" data-umami-event="unfake-clean-lists">Email list cleaner</a>,
+			to weed throwaway addresses out of a list you already have.
+		</li>
+		<li>
+			<a href="https://unfake.dev/compare-blocklists" data-umami-event="unfake-compare">Blocklist comparison</a>,
+			to see how Unfake stacks up against the popular open-source blocklists
+			on GitHub, one address at a time.
+		</li>
+	</ul>
+
+	<h2>Using Unfake</h2>
+
+	<p>
+		Create an account at
+		<a href="https://unfake.dev/" data-umami-event="unfake-site">unfake.dev</a>,
+		grab an API key from the dashboard, and add one request to your signup
+		flow. The <a href="https://unfake.dev/docs" data-umami-event="unfake-docs">docs</a>
+		cover the rest.
+	</p>
+</ProjectLayout>
+
+<style>
+	.intro {
+		margin: 2rem 0;
+	}
+
+	p,
+	li {
+		font-size:   1.05rem;
+		line-height: 1.7;
+	}
+
+	li + li {
+		margin-top: 0.5rem;
+	}
+
+	h2 {
+		margin-top: 2.5rem;
+	}
+
+	/* Scales down on small screens so all 36 columns fit, no scrolling. */
+	.diagram {
+		margin:           1.5rem 0;
+		padding:          1rem 0.75rem;
+		background-color: var(--code-bg);
+		border-radius:    4px;
+		font-size:        min(0.8rem, 2.9vw);
+		line-height:      1.35;
+	}
+</style>

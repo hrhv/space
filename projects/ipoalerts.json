@@ -1,0 +1,13 @@
+{
+  "name": "ipoalerts",
+  "tagline": "IPO and GMP data APIs for Indian fintech apps",
+  "description": "ipoalerts is an API for IPO and grey market premium (GMP) data in India. It started in 2021 as a weekend project that emailed people about IPOs, and now powers 500+ apps and websites.",
+  "logo": "/assets/projects/ipoalerts/logo.png",
+  "favicon": "/assets/projects/ipoalerts/favicon.png",
+  "added": "2026-10-14",
+  "nav": [
+    { "label": "ipoalerts.in", "href": "https://ipoalerts.in/" },
+    { "label": "docs", "href": "https://ipoalerts.in/docs" },
+    { "label": "blog", "href": "https://ipoalerts.in/blog/" }
+  ]
+}

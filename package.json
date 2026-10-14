@@ -13,7 +13,9 @@
 	"scripts": {
 		"dev": "concurrently \"npx tinacms dev\" \"astro dev\"",
 		"start": "astro dev",
-		"build": "export $(cat .env | xargs) && NODE_OPTIONS=--max-old-space-size=4096 tinacms build && astro build && cp dist/sitemap-index.xml dist/sitemap.xml",
+		"build": "export $(cat .env | xargs) && npm run build:cms && npm run build:site",
+		"build:cms": "NODE_OPTIONS=--max-old-space-size=4096 tinacms build",
+		"build:site": "astro build && cp dist/sitemap-index.xml dist/sitemap.xml",
 		"preview": "astro preview",
 		"astro": "astro"
 	},

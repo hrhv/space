@@ -1,0 +1,13 @@
+{
+  "name": "Unfake",
+  "tagline": "Keeps throwaway email addresses out of your signups",
+  "description": "Unfake is an API that spots disposable and temporary email addresses. I built it after throwaway signups started piling up on ipoalerts, and it now screens signups on ipoalerts and a few other websites.",
+  "logo": "/assets/projects/unfake/logo.png",
+  "favicon": "/assets/projects/unfake/favicon.png",
+  "added": "2026-10-14",
+  "nav": [
+    { "label": "unfake.dev", "href": "https://unfake.dev/" },
+    { "label": "docs", "href": "https://unfake.dev/docs" },
+    { "label": "blog", "href": "https://unfake.dev/blog/" }
+  ]
+}

@@ -3,6 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - README.md
+      - REDIRECTS.md
+      - LICENSE
   workflow_dispatch:
 
 permissions:
@@ -21,19 +25,50 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
+        id: node
         with:
-          node-version: 22
-          cache: npm
+          node-version: 24
+
+      # Restoring node_modules is much faster than `npm ci`, which spends ~2 min
+      # unpacking Tina's dependency tree. Only reinstall when the lockfile changes.
+      - name: Cache node_modules
+        id: modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: modules-${{ runner.os }}-node${{ steps.node.outputs.node-version }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
+        if: steps.modules.outputs.cache-hit != 'true'
         run: npm ci
 
-      - name: Build
+      # The Tina admin app only changes with the schema or Tina's version, so a
+      # content-only push reuses the last build and just refreshes the search index.
+      - name: Cache Tina admin
+        id: admin
+        uses: actions/cache@v4
+        with:
+          path: public/admin
+          key: tina-admin-${{ hashFiles('tina/config.js', 'tina/tina-lock.json', 'package-lock.json') }}
+
+      - name: Build Tina admin
+        if: steps.admin.outputs.cache-hit != 'true'
         env:
           TINACLIENTID: ${{ secrets.TINACLIENTID }}
           TINATOKEN: ${{ secrets.TINATOKEN }}
           TINASEARCH: ${{ secrets.TINASEARCH }}
-        run: npm run build
+        run: npm run build:cms
+
+      - name: Update Tina search index
+        if: steps.admin.outputs.cache-hit == 'true'
+        env:
+          TINACLIENTID: ${{ secrets.TINACLIENTID }}
+          TINATOKEN: ${{ secrets.TINATOKEN }}
+          TINASEARCH: ${{ secrets.TINASEARCH }}
+        run: npx tinacms search-index
+
+      - name: Build site
+        run: npm run build:site
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

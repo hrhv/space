@@ -1,0 +1,218 @@
+---
+import ProjectLayout from "../../../layouts/ProjectLayout.astro";
+import ProjectFacts from "../../../components/projects/ProjectFacts.astro";
+import ProjectFact from "../../../components/projects/ProjectFact.astro";
+
+// Plain ASCII on purpose: box-drawing glyphs aren't in the font's latin
+// subset and would fall back to another font, breaking the alignment.
+const diagram = ` exchanges  registrars    gmp
+ & filings  & brokers   trackers
+     |          |          |
+     +----------+----------+
+                |
+   +------------v------------+
+   |        ipoalerts        |
+   |   merges, cleans and    |
+   |   refreshes every ipo   |
+   +-------------------------+
+   | GET /ipos               |
+   | GET /ipos/{id}/gmp      |
+   +------------+------------+
+                |
+     fintech apps & websites`;
+
+// A real response from October 2026, trimmed to the interesting fields.
+const sample = `$ curl "https://api.ipoalerts.in/ipos?status=open" \\
+    -H "x-api-key: YOUR_API_KEY"
+
+{
+  "ipos": [
+    {
+      "name": "HD Fire Protect Limited",
+      "symbol": "HDFIRE",
+      "status": "open",
+      "startDate": "2026-10-13",
+      "endDate": "2026-10-15",
+      "listingDate": "2026-10-21",
+      "priceRange": "258-271",
+      "minQty": 55,
+      "minAmount": 14905,
+      "issueSize": "712cr",
+      "subscription": { "timesSubscribed": 10.99 },
+      ...
+    }
+  ]
+}`;
+---
+
+<ProjectLayout project="ipoalerts">
+	<section class="intro">
+		<p>
+			ipoalerts is an API for IPO data in India. Fintech apps and websites
+			plug into it to show which IPOs are open, what's coming up, how heavily
+			an issue is subscribed and where its grey market premium is heading,
+			without scraping a dozen sources themselves.
+		</p>
+		<p>
+			It started in 2021 as a weekend project that emailed people about IPOs.
+			It's been an API since 2024, and these days it powers 500+ apps and
+			websites.
+		</p>
+	</section>
+
+	<ProjectFacts>
+		<ProjectFact label="what">IPO and GMP data APIs for Indian markets</ProjectFact>
+		<ProjectFact label="covers">
+			Mainboard, SME and debt issues on NSE & BSE, back to 2012
+		</ProjectFact>
+		<ProjectFact label="started">a weekend project, in April 2021</ProjectFact>
+		<ProjectFact label="used by">500+ apps and websites</ProjectFact>
+		<ProjectFact label="pricing">
+			free tier; <a href="https://ipoalerts.in/pricing" data-umami-event="ipoalerts-pricing">paid plans</a> from ₹499 a month
+		</ProjectFact>
+		<ProjectFact label="status">live</ProjectFact>
+	</ProjectFacts>
+
+	<h2>How it started</h2>
+
+	<p>
+		India had an IPO boom in early 2021, and lots of casual investors wanted
+		in. The catch: an IPO only takes applications for a few days, and it was
+		easy to miss the window. Brokers and finance sites had the data, but none
+		of them sent a reliable heads-up.
+	</p>
+	<p>
+		So one weekend in April 2021, I built ipoalerts: a small service that
+		emailed subscribers about upcoming IPOs and the dates that mattered. It
+		grew to over 200 subscribers, and for a while you could even reach it
+		<a href="/blog/port-a-website-to-the-dark-web-in-under-2-minutes" data-umami-event="ipoalerts-tor">over Tor</a>.
+	</p>
+	<p>
+		Then the numbers caught up with it. Fewer than 5% of people opened an
+		alert on the day it was sent, which was the only day it was useful, and
+		running it cost more than it was worth. Moving the alerts to WhatsApp
+		might have reached people in time, but the WhatsApp Business API was far
+		too expensive back then. I shut the emails down later that year.
+	</p>
+
+	<h2>From alerts to an API</h2>
+
+	<p>
+		The API and docs behind those emails never went offline, though. In 2024,
+		developers started writing in to ask for IPO data, so I turned ipoalerts
+		into a proper API, with API keys, rate limits, caching and a self-serve
+		way to get started.
+	</p>
+	<p>
+		It
+		<a href="https://ipoalerts.in/blog/announcing-ipoalerts/" data-umami-event="ipoalerts-announcement">relaunched</a>
+		in September 2024. A dashboard for keys and usage followed that December,
+		and grey market premium trends joined the IPO data in August 2026.
+	</p>
+
+	<h2>What it does</h2>
+
+	<ul>
+		<li>
+			<strong>IPO Data API.</strong> Every IPO on NSE and BSE since 2012, with
+			30+ fields per issue: every date from bidding to listing, price band, lot
+			size, subscription numbers, listing gains, and a short read on the
+			business, its strengths and its risks. Filter by status, type, exchange
+			or year.
+		</li>
+		<li>
+			<strong>GMP Trends API.</strong> Grey market premium as a time series,
+			down to 5-minute intervals, combined from several public sources and
+			summarised as the mean, median, min, max or mode.
+		</li>
+		<li>
+			<strong>A dashboard.</strong> API keys, usage and your plan, all in one
+			place.
+		</li>
+		<li>
+			<strong>Quickstarts in 12 languages.</strong> From JavaScript and Python
+			to Swift and Kotlin, so it takes a couple of minutes to wire up.
+		</li>
+	</ul>
+
+	<h2>How it works</h2>
+
+	<p>
+		ipoalerts doesn't have a private line into the exchanges. It collects
+		publicly available data (exchange announcements, registrars, brokers,
+		issuer filings and GMP trackers), merges it into one clean record per IPO,
+		and serves that over a REST API.
+	</p>
+
+	<pre
+		class="diagram"
+		role="img"
+		aria-label="Exchanges and filings, registrars and brokers, and GMP trackers all feed into ipoalerts, which merges and refreshes every IPO and serves it to fintech apps and websites through the /ipos and /ipos/{id}/gmp endpoints."
+	>{diagram}</pre>
+
+	<p>Asking for the IPOs open right now looks like this:</p>
+
+	<pre class="sample"><code>{sample}</code></pre>
+
+	<p>
+		Because it's aggregated rather than official, the data can lag by a few
+		minutes. For anything that matters, check it against the exchange.
+	</p>
+
+	<h2>Using ipoalerts</h2>
+
+	<p>
+		There's a free tier with 25 requests a day for the IPOs that are open
+		right now. Paid plans start at ₹499 a month and add the full history back
+		to 2012, advanced filters and higher limits, with GMP data available as an
+		add-on.
+	</p>
+	<p>
+		Sign up at <a href="https://ipoalerts.in/" data-umami-event="ipoalerts-site">ipoalerts.in</a>,
+		grab a key from the dashboard, and the
+		<a href="https://ipoalerts.in/docs" data-umami-event="ipoalerts-docs">docs</a>
+		take it from there. Questions, bugs and feature requests go to
+		<a href="mailto:support@ipoalerts.in">support@ipoalerts.in</a>.
+	</p>
+</ProjectLayout>
+
+<style>
+	.intro {
+		margin: 2rem 0;
+	}
+
+	p,
+	li {
+		font-size:   1.05rem;
+		line-height: 1.7;
+	}
+
+	li + li {
+		margin-top: 0.5rem;
+	}
+
+	h2 {
+		margin-top: 2.5rem;
+	}
+
+	/* Scales down on small screens so all 32 columns fit, no scrolling. */
+	.diagram {
+		margin:           1.5rem 0;
+		padding:          1rem 0.75rem;
+		background-color: var(--code-bg);
+		border-radius:    4px;
+		font-size:        min(0.8rem, 2.9vw);
+		line-height:      1.35;
+	}
+
+	/* Long lines scroll inside the box rather than widening the page. */
+	.sample {
+		margin:           1.5rem 0;
+		padding:          1rem 0.75rem;
+		overflow-x:       auto;
+		background-color: var(--code-bg);
+		border-radius:    4px;
+		font-size:        0.8rem;
+		line-height:      1.45;
+	}
+</style>
