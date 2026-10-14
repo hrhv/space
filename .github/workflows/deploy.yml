@@ -20,11 +20,11 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         id: node
         with:
           node-version: 24
@@ -33,7 +33,7 @@ jobs:
       # unpacking Tina's dependency tree. Only reinstall when the lockfile changes.
       - name: Cache node_modules
         id: modules
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: node_modules
           key: modules-${{ runner.os }}-node${{ steps.node.outputs.node-version }}-${{ hashFiles('package-lock.json') }}
@@ -46,7 +46,7 @@ jobs:
       # content-only push reuses the last build and just refreshes the search index.
       - name: Cache Tina admin
         id: admin
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: public/admin
           key: tina-admin-${{ hashFiles('tina/config.js', 'tina/tina-lock.json', 'package-lock.json') }}
@@ -71,17 +71,17 @@ jobs:
         run: npm run build:site
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
