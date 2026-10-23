@@ -1,0 +1,41 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import ColorScript from "../components/ColorScript.astro";
+import { title, social } from "../settings/settings.json";
+
+const links = [
+	{ label: "GitHub", href: social.github, event: "socials-github" },
+	{ label: "LinkedIn", href: social.linkedin, event: "socials-linkedin" },
+	{ label: "X", href: social.twitter, event: "socials-x" },
+	{ label: "YouTube", href: social.youtube, event: "socials-youtube" },
+	{ label: "Bluesky", href: social.bluesky, event: "socials-bluesky" },
+];
+---
+
+<!doctype html>
+<html lang="en-us">
+	<BaseHead title={`Socials — ${title}`} description="Where to find Harshit Budhraja online" />
+	<body>
+		<Header />
+		<main>
+			<h1>Socials</h1>
+			<p>Here's where you can find me around the internet.</p>
+			<ul>
+				{
+					links.map(({ label, href, event }) => (
+						<li>
+							{label}:{" "}
+							<a href={href} target="_blank" rel="noopener noreferrer" data-umami-event={event}>
+								{href.replace(/^https?:\/\/(www\.)?/, "")}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</main>
+		<Footer />
+		<ColorScript />
+	</body>
+</html>

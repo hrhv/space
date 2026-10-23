@@ -1,0 +1,48 @@
+---
+import { backToTop } from "../settings/settings.json";
+
+// Shown only on pages at least `minPageHeight` viewports tall
+// (see backToTop in settings/settings.json).
+const { enabled = true, minPageHeight = 2 } = backToTop ?? {};
+---
+
+{
+	enabled && (
+		<a href="#" id="back-to-top" data-min-height={minPageHeight} data-umami-event="back-to-top" hidden>
+			Back to top
+		</a>
+	)
+}
+
+<script is:inline>
+	(() => {
+		const link = document.getElementById("back-to-top");
+		if (!link) return;
+		const update = () => {
+			const min = Number(link.dataset.minHeight) * window.innerHeight;
+			link.hidden = document.documentElement.scrollHeight < min;
+		};
+		update();
+		window.addEventListener("resize", update);
+		window.addEventListener("load", update);
+		link.addEventListener("click", (e) => {
+			e.preventDefault();
+			window.scrollTo({ top: 0, behavior: "smooth" });
+			history.replaceState(null, "", location.pathname + location.search);
+		});
+	})();
+</script>
+
+<style>
+	#back-to-top {
+		position: fixed;
+		right: 1.5rem;
+		bottom: 1.5rem;
+		font-size: 0.8rem;
+		background: var(--bg);
+		padding: 0.25rem 0.5rem;
+	}
+	#back-to-top[hidden] {
+		display: none;
+	}
+</style>

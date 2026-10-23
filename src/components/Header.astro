@@ -1,6 +1,6 @@
 ---
 import HeaderLink from "./HeaderLink.astro";
-import { name, subtitle, social, photo } from "../settings/settings.json";
+import { name, subtitle, photo } from "../settings/settings.json";
 
 // With no props this is the site header. Project pages pass their own
 // identity and navbar (see layouts/ProjectLayout.astro).
@@ -15,11 +15,7 @@ const {
 	links = [
 		{ href: "/", label: "home", event: "nav-home" },
 		{ href: "/blog", label: "blog", event: "nav-blog" },
-		{ href: social.github, label: "github", event: "nav-github" },
-		{ href: social.linkedin, label: "linkedin", event: "nav-linkedin" },
-		{ href: social.twitter, label: "x", event: "nav-x" },
-		{ href: social.youtube, label: "youtube", event: "nav-youtube" },
-		{ href: social.bluesky, label: "bluesky", event: "nav-bluesky" },
+		{ href: "/socials", label: "socials", event: "nav-socials" },
 	],
 } = Astro.props;
 

@@ -9,5 +9,9 @@
     "twitter": "https://x.com/harshitbudhraja",
     "youtube": "https://youtube.com/@prodengg",
     "bluesky": "https://bsky.app/profile/harshitbudhraja.com"
+  },
+  "backToTop": {
+    "enabled": true,
+    "minPageHeight": 2
   }
 }
