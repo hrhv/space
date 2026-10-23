@@ -42,7 +42,9 @@ const isExternal = (url) => /^https?:\/\//.test(url);
 <nav>
 	<div class="nav-links">
 		{
-			links.map(({ href, label, event, exact }) => (
+			links.map(({ href, label, event, exact }, i) => (
+				<>
+				{i > 0 && <span class="nav-sep" aria-hidden="true">·</span>}
 				<HeaderLink
 					href={href}
 					exact={exact}
@@ -51,6 +53,7 @@ const isExternal = (url) => /^https?:\/\//.test(url);
 				>
 					{label}
 				</HeaderLink>
+				</>
 			))
 		}
 	</div>
@@ -138,12 +141,13 @@ const isExternal = (url) => /^https?:\/\//.test(url);
 		justify-content: center;
 		margin-top: 20px;
 	}
-	.nav-links a {
+	.nav-links :global(a) {
 		margin:  10px 0;
-		padding: 0 12px 0 0;
-	}
-	.nav-links a:last-child {
 		padding: 0;
+	}
+	.nav-sep {
+		margin: 10px 14px;
+		color:  var(--gray);
 	}
 
 	/* ── Mobile ── */
@@ -165,7 +169,10 @@ const isExternal = (url) => /^https?:\/\//.test(url);
 		.nav-links.open {
 			display: flex;
 		}
-		.nav-links a {
+		.nav-sep {
+			display: none;
+		}
+		.nav-links :global(a) {
 			margin:  0;
 			padding: 6px 0;
 			width:   100%;
