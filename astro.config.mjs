@@ -1,5 +1,7 @@
 import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
+import { satteri } from "@astrojs/markdown-satteri";
+import htmlEmbed from "./src/plugins/html-embed.mjs";
 
 // https://astro.build/config
 export default defineConfig({
@@ -7,6 +9,7 @@ export default defineConfig({
 	base: "/",
 	integrations: [sitemap()],
 	markdown: {
+		processor: satteri({ mdastPlugins: [htmlEmbed] }),
 		shikiConfig: {
 			theme: "material-theme-darker",
 			langs: [],

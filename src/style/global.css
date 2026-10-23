@@ -254,6 +254,16 @@ img {
 	height:    auto;
 }
 
+/* Interactive HTML embeds — see plugins/remark-html-embed.mjs.
+   The height is set from the embed's content by components/HtmlEmbeds.astro. */
+iframe.html-embed {
+	display:    block;
+	width:      100%;
+	height:     480px;
+	border:     0;
+	margin:     1.5em 0;
+}
+
 .center {
 	text-align: center;
 }

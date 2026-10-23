@@ -4,6 +4,7 @@ import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import ColorScript from "../components/ColorScript.astro";
+import HtmlEmbeds from "../components/HtmlEmbeds.astro";
 import Tags from "../components/Tags.astro";
 import getTags from "../scripts/getTags";
 
@@ -61,5 +62,6 @@ if (updated) {
 		<Tags tags={allTags} all />
 		<Footer />
 		<ColorScript />
+		<HtmlEmbeds />
 	</body>
 </html>

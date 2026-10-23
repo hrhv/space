@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>How a shared host hands out CPU time</title>
+<style>
+	@font-face {
+		font-family: "iA Writer Mono";
+		font-style: normal;
+		font-display: swap;
+		font-weight: 400;
+		src: url(https://cdn.jsdelivr.net/fontsource/fonts/ia-writer-mono@latest/latin-400-normal.woff2) format("woff2");
+	}
+	@font-face {
+		font-family: "iA Writer Mono";
+		font-style: normal;
+		font-display: swap;
+		font-weight: 700;
+		src: url(https://cdn.jsdelivr.net/fontsource/fonts/ia-writer-mono@latest/latin-700-normal.woff2) format("woff2");
+	}
+
+	/* Same tokens as the site. The blog sets data-theme on <html>; opened on
+	   its own, the page follows the OS setting instead. */
+	:root {
+		--green: #24d05a;
+		--pink: #eb4888;
+		--blue: #10a2f5;
+		--yellow: #e9bc3f;
+		--purple: #9b6dff;
+		--orange: #f08c2e;
+		--red: #e4002b;
+
+		--bg: #efefef;
+		--fg: #252525;
+		--gray: #6b6b6b;
+		--line: rgba(37, 37, 37, 0.16);
+		--lane: rgba(37, 37, 37, 0.06);
+		--panel: rgba(37, 37, 37, 0.04);
+		color-scheme: light;
+	}
+	:root[data-theme="dark"] {
+		--bg: #191919;
+		--fg: #e8e8e8;
+		--gray: #a0a0a0;
+		--line: rgba(255, 255, 255, 0.16);
+		--lane: rgba(255, 255, 255, 0.06);
+		--panel: rgba(255, 255, 255, 0.04);
+		color-scheme: dark;
+	}
+	@media (prefers-color-scheme: dark) {
+		:root:not([data-theme]) {
+			--bg: #191919;
+			--fg: #e8e8e8;
+			--gray: #a0a0a0;
+			--line: rgba(255, 255, 255, 0.16);
+			--lane: rgba(255, 255, 255, 0.06);
+			--panel: rgba(255, 255, 255, 0.04);
+			color-scheme: dark;
+		}
+	}
+
+	* { box-sizing: border-box; }
+
+	html, body {
+		margin: 0;
+		background: var(--bg);
+		color: var(--fg);
+		font-family: "iA Writer Mono", ui-monospace, monospace;
+		font-size: 13px;
+		line-height: 1.45;
+	}
+
+	.sim {
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: 14px;
+		background: var(--panel);
+	}
+
+	.head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		flex-wrap: wrap;
+		margin-bottom: 12px;
+	}
+	.head h2 {
+		margin: 0;
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--fg);
+	}
+	.transport { display: flex; gap: 6px; }
+
+	button {
+		font: inherit;
+		color: var(--fg);
+		background: transparent;
+		border: 1px solid var(--line);
+		border-radius: 4px;
+		padding: 3px 9px;
+		cursor: pointer;
+		min-height: 28px;
+	}
+	button:hover { border-color: var(--gray); }
+	button:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+	button[aria-pressed="true"] {
+		background: var(--fg);
+		color: var(--bg);
+		border-color: var(--fg);
+	}
+	button:disabled { opacity: 0.4; cursor: default; }
+
+	.controls {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 10px 16px;
+		margin-bottom: 14px;
+	}
+	.control .label {
+		display: block;
+		color: var(--gray);
+		font-size: 11px;
+		margin-bottom: 4px;
+	}
+	.seg { display: flex; flex-wrap: wrap; gap: 4px; }
+
+	.timeline { position: relative; }
+	canvas { display: block; width: 100%; touch-action: pan-y; }
+
+	.tip {
+		position: absolute;
+		pointer-events: none;
+		background: var(--fg);
+		color: var(--bg);
+		font-size: 11px;
+		padding: 4px 7px;
+		border-radius: 4px;
+		white-space: nowrap;
+		opacity: 0;
+		transition: opacity 0.1s;
+		z-index: 1;
+	}
+
+	.legend {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px 12px;
+		margin: 8px 0 12px;
+		font-size: 11px;
+		color: var(--gray);
+	}
+	.legend span { display: inline-flex; align-items: center; gap: 5px; }
+	.swatch {
+		width: 10px;
+		height: 10px;
+		border-radius: 2px;
+		display: inline-block;
+	}
+	.swatch.steal {
+		background: repeating-linear-gradient(135deg, var(--red) 0 2px, transparent 2px 4px);
+		outline: 1px solid var(--red);
+		outline-offset: -1px;
+	}
+	.swatch.reserved {
+		background: repeating-linear-gradient(135deg, var(--green) 0 1px, transparent 1px 4px);
+		outline: 1px solid var(--green);
+		outline-offset: -1px;
+	}
+
+	.queue {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 4px;
+		min-height: 24px;
+		margin-bottom: 12px;
+		font-size: 11px;
+	}
+	.queue .label { color: var(--gray); margin-right: 4px; }
+	.chip {
+		border-radius: 3px;
+		padding: 1px 6px;
+		color: #191919;
+		font-size: 11px;
+	}
+	.chip.you { outline: 2px solid var(--red); outline-offset: 1px; }
+	.queue .empty { color: var(--gray); }
+
+	.stats {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 8px;
+		margin-bottom: 10px;
+	}
+	.stat {
+		border: 1px solid var(--line);
+		border-radius: 4px;
+		padding: 8px 10px;
+	}
+	.stat .value { font-size: 20px; font-weight: 700; line-height: 1.2; }
+	.stat .value.bad { color: var(--red); }
+	.stat .what { font-size: 11px; color: var(--gray); }
+
+	.top {
+		font-size: 12px;
+		padding: 6px 10px;
+		border-radius: 4px;
+		background: var(--lane);
+		overflow-x: auto;
+		white-space: pre;
+		margin-bottom: 10px;
+	}
+	.top .st { color: var(--red); font-weight: 700; }
+
+	.story { margin: 0; color: var(--fg); min-height: 3em; }
+
+	@media (max-width: 520px) {
+		.controls { grid-template-columns: minmax(0, 1fr); }
+		.stats { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+		.stat:last-child { grid-column: span 2; }
+	}
+</style>
+</head>
+<body>
+<div class="sim">
+	<div class="head">
+		<h2>One host, 2 cores × 2 threads</h2>
+		<div class="transport">
+			<button id="play" type="button">Pause</button>
+			<button id="step" type="button" disabled>Step</button>
+			<button id="speed" type="button" aria-label="Playback speed 1×">1×</button>
+		</div>
+	</div>
+
+	<div class="controls">
+		<div class="control">
+			<span class="label" id="l-mode">Your plan</span>
+			<div class="seg" role="group" aria-labelledby="l-mode" data-key="mode">
+				<button type="button" data-value="shared">Shared vCPU</button>
+				<button type="button" data-value="dedicated">Dedicated vCPU</button>
+			</div>
+		</div>
+		<div class="control">
+			<span class="label" id="l-count">Neighbour VMs (2 vCPUs each)</span>
+			<div class="seg" role="group" aria-labelledby="l-count" data-key="neighbours">
+				<button type="button" data-value="0">0</button>
+				<button type="button" data-value="1">1</button>
+				<button type="button" data-value="2">2</button>
+				<button type="button" data-value="3">3</button>
+				<button type="button" data-value="4">4</button>
+				<button type="button" data-value="5">5</button>
+			</div>
+		</div>
+		<div class="control">
+			<span class="label" id="l-you">Your workload</span>
+			<div class="seg" role="group" aria-labelledby="l-you" data-key="yourLoad">
+				<button type="button" data-value="light">Light</button>
+				<button type="button" data-value="steady">Steady</button>
+				<button type="button" data-value="pegged">Pegged</button>
+			</div>
+		</div>
+		<div class="control">
+			<span class="label" id="l-them">Neighbours' workload</span>
+			<div class="seg" role="group" aria-labelledby="l-them" data-key="theirLoad">
+				<button type="button" data-value="quiet">Quiet</button>
+				<button type="button" data-value="bursty">Bursty</button>
+				<button type="button" data-value="pegged">Pegged</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="timeline">
+		<canvas id="canvas" role="img" aria-label="Timeline of which VM runs on each hardware thread"></canvas>
+		<div class="tip" id="tip"></div>
+	</div>
+
+	<div class="legend" id="legend"></div>
+
+	<div class="queue" id="queue" aria-hidden="true"></div>
+
+	<div class="stats">
+		<div class="stat">
+			<div class="value" id="s-steal">0%</div>
+			<div class="what">steal time (st)</div>
+		</div>
+		<div class="stat">
+			<div class="value" id="s-got">100%</div>
+			<div class="what">got a thread when ready</div>
+		</div>
+		<div class="stat">
+			<div class="value" id="s-over">1.0×</div>
+			<div class="what" id="s-over-what">vCPUs per thread</div>
+		</div>
+	</div>
+
+	<div class="top" id="top" aria-label="top output inside your VM"></div>
+
+	<p class="story" id="story" aria-live="polite"></p>
+</div>
+
+<script>
+(() => {
+	// ── Model ─────────────────────────────────────────────────────────────────
+	// The host has 4 hardware threads. Every VM has 2 vCPUs. Each tick, every
+	// vCPU either has work to do or is idle, and the hypervisor hands out the 4
+	// threads to vCPUs that have work, fairest-first (least CPU received so
+	// far), for a time slice of a few ticks. A vCPU with work but no thread is
+	// "stolen" from: that's what shows up as st inside the VM.
+
+	const THREADS = 4;
+	const SLICE = 4;               // ticks a vCPU keeps a thread before it can be preempted
+	const WINDOW = 120;            // ticks the stats are averaged over
+	const HISTORY = 600;
+	const TICK_MS = 200;
+	const SPEEDS = [1, 2, 0.5];
+
+	// pStart: chance an idle vCPU wakes up each tick. meanBurst: ticks of work it then needs.
+	const LOADS = {
+		light:  { pStart: 0.05, meanBurst: 3 },
+		steady: { pStart: 0.12, meanBurst: 6 },
+		quiet:  { pStart: 0.03, meanBurst: 3 },
+		bursty: { pStart: 0.05, meanBurst: 14 },
+		pegged: { pStart: 1, meanBurst: Infinity },
+	};
+
+	const NEIGHBOUR_COLORS = ["pink", "blue", "yellow", "purple", "orange"];
+
+	const settings = { mode: "shared", neighbours: 3, yourLoad: "steady", theirLoad: "bursty" };
+
+	let tick = 0;
+	let vms = [];
+	let threads = Array.from({ length: THREADS }, () => ({ occ: null, slice: 0 }));
+	let history = [];
+
+	function makeVm(id) {
+		const vm = {
+			id,
+			you: id === 0,
+			name: id === 0 ? "You" : "Neighbour " + id,
+			short: id === 0 ? "You" : "N" + id,
+			color: id === 0 ? "green" : NEIGHBOUR_COLORS[(id - 1) % NEIGHBOUR_COLORS.length],
+			vcpus: [],
+		};
+		const floor = minVruntime();
+		for (let i = 0; i < 2; i++) {
+			vm.vcpus.push({ vm, idx: i, work: 0, vruntime: floor, lastThread: -1 });
+		}
+		return vm;
+	}
+
+	function allVcpus() {
+		return vms.flatMap((vm) => vm.vcpus);
+	}
+
+	function minVruntime() {
+		const v = allVcpus();
+		return v.length ? Math.min(...v.map((c) => c.vruntime)) : 0;
+	}
+
+	function burstLength(mean) {
+		if (mean === Infinity) return Infinity;
+		// Geometric distribution with the given mean, at least one tick.
+		return 1 + Math.floor(Math.log(1 - Math.random()) / Math.log(1 - 1 / mean));
+	}
+
+	function loadFor(vm) {
+		return LOADS[vm.you ? settings.yourLoad : settings.theirLoad];
+	}
+
+	function syncVms() {
+		if (!vms.length) vms.push(makeVm(0));
+		while (vms.length - 1 < settings.neighbours) vms.push(makeVm(vms.length));
+		if (vms.length - 1 > settings.neighbours) {
+			vms.length = settings.neighbours + 1;
+			const alive = new Set(allVcpus());
+			threads.forEach((t) => { if (t.occ && !alive.has(t.occ)) t.occ = null; });
+		}
+		// A changed workload takes effect straight away rather than after the current burst.
+		allVcpus().forEach((c) => {
+			const load = loadFor(c.vm);
+			if (load.meanBurst === Infinity) c.work = Infinity;
+			else if (c.work === Infinity) c.work = burstLength(load.meanBurst);
+		});
+	}
+
+	// Threads a vCPU may run on. Dedicated: your vCPUs own core 0, neighbours share core 1.
+	function allowed(vcpu, t) {
+		if (settings.mode !== "dedicated") return true;
+		return vcpu.vm.you ? t === vcpu.idx : t >= 2;
+	}
+
+	function step() {
+		tick++;
+
+		// 1. Idle vCPUs may wake up with new work. They join at the queue's
+		//    current level, so time spent asleep isn't banked as extra priority.
+		const busy = allVcpus().filter((c) => c.work > 0);
+		const floor = busy.length ? Math.min(...busy.map((c) => c.vruntime)) : minVruntime();
+		allVcpus().forEach((c) => {
+			if (c.work > 0) return;
+			const load = loadFor(c.vm);
+			if (Math.random() < load.pStart) {
+				c.work = burstLength(load.meanBurst);
+				c.vruntime = Math.max(c.vruntime, floor);
+			}
+		});
+
+		// 2. Free threads whose vCPU finished, or whose slice ran out.
+		threads.forEach((t, i) => {
+			if (!t.occ) return;
+			if (t.occ.work <= 0 || t.slice <= 0 || !allowed(t.occ, i)) t.occ = null;
+		});
+
+		// 3. Hand free threads to waiting vCPUs, least CPU received first.
+		const running = new Set(threads.map((t) => t.occ).filter(Boolean));
+		const waiting = allVcpus()
+			.filter((c) => c.work > 0 && !running.has(c))
+			.sort((a, b) => a.vruntime - b.vruntime || Math.random() - 0.5);
+
+		for (const c of waiting) {
+			const free = threads
+				.map((t, i) => i)
+				.filter((i) => !threads[i].occ && allowed(c, i));
+			if (!free.length) continue;
+			// Prefer the thread it ran on last (warm caches), like a real scheduler.
+			const pick = free.includes(c.lastThread) ? c.lastThread : free[0];
+			threads[pick].occ = c;
+			threads[pick].slice = SLICE;
+			c.lastThread = pick;
+			running.add(c);
+		}
+
+		// 4. Record this tick, then run it.
+		const you = vms[0].vcpus.map((c) =>
+			running.has(c) ? "run" : c.work > 0 ? "wait" : "idle"
+		);
+		const queue = allVcpus().filter((c) => c.work > 0 && !running.has(c));
+		history.push({
+			tick,
+			threads: threads.map((t, i) => {
+				if (t.occ) return t.occ;
+				if (settings.mode === "dedicated" && i < 2) return "reserved";
+				return null;
+			}),
+			you,
+			queue,
+		});
+		if (history.length > HISTORY) history.shift();
+
+		threads.forEach((t) => {
+			if (!t.occ) return;
+			t.occ.work -= 1;
+			t.occ.vruntime += 1;
+			t.slice -= 1;
+		});
+	}
+
+	// ── Drawing ───────────────────────────────────────────────────────────────
+
+	const canvas = document.getElementById("canvas");
+	const ctx = canvas.getContext("2d");
+	const tip = document.getElementById("tip");
+
+	let colors = {};
+	let patterns = {};
+	let layout = {};
+
+	function readColors() {
+		const css = getComputedStyle(document.documentElement);
+		["green", "pink", "blue", "yellow", "purple", "orange", "red", "fg", "gray", "line", "lane", "bg"]
+			.forEach((k) => { colors[k] = css.getPropertyValue("--" + k).trim(); });
+		patterns.steal = hatch(colors.red, 2.5);
+		patterns.reserved = hatch(colors.green, 1);
+	}
+
+	function hatch(color, width) {
+		const p = document.createElement("canvas");
+		p.width = p.height = 6 * devicePixelRatio;
+		const g = p.getContext("2d");
+		g.scale(devicePixelRatio, devicePixelRatio);
+		g.strokeStyle = color;
+		g.lineWidth = width;
+		g.beginPath();
+		for (let x = -6; x <= 12; x += 6) { g.moveTo(x, 6); g.lineTo(x + 6, 0); }
+		g.stroke();
+		return ctx.createPattern(p, "repeat");
+	}
+
+	const LANE_H = 16;
+	const LANE_GAP = 4;
+	const HEADING_H = 20;
+	const SECTION_GAP = 14;
+
+	function computeLayout() {
+		const width = canvas.parentElement.clientWidth;
+		const narrow = width < 440;
+		const gutter = narrow ? 58 : 92;
+		const cell = narrow ? 5 : 7;
+		const lanes = [];
+		let y = HEADING_H;
+		for (let i = 0; i < THREADS; i++) {
+			const core = i >> 1, thread = i & 1;
+			lanes.push({ kind: "thread", i, y, label: narrow ? `c${core}·t${thread}` : `core ${core} · t${thread}` });
+			y += LANE_H + LANE_GAP + (i === 1 ? 6 : 0);
+		}
+		y += SECTION_GAP;
+		const youHeading = y;
+		y += HEADING_H;
+		for (let i = 0; i < 2; i++) {
+			lanes.push({ kind: "you", i, y, label: `vCPU ${i}` });
+			y += LANE_H + LANE_GAP;
+		}
+		const height = y;
+		layout = { width, height, gutter, cell, lanes, youHeading, plotW: width - gutter };
+
+		canvas.width = Math.round(width * devicePixelRatio);
+		canvas.height = Math.round(height * devicePixelRatio);
+		canvas.style.height = height + "px";
+		ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+		readColors();
+	}
+
+	function vmColor(vm) {
+		return colors[vm.color];
+	}
+
+	function draw(progress) {
+		const { width, height, gutter, cell, lanes, youHeading, plotW } = layout;
+		ctx.clearRect(0, 0, width, height);
+
+		ctx.font = '11px "iA Writer Mono", ui-monospace, monospace';
+		ctx.textBaseline = "middle";
+
+		ctx.fillStyle = colors.gray;
+		ctx.fillText("HARDWARE THREADS ON THE HOST", 0, HEADING_H / 2 - 2);
+		ctx.fillText("INSIDE YOUR VM", 0, youHeading + HEADING_H / 2 - 2);
+
+		for (const lane of lanes) {
+			ctx.fillStyle = colors.gray;
+			ctx.fillText(lane.label, 0, lane.y + LANE_H / 2 + 1);
+			ctx.fillStyle = colors.lane;
+			ctx.fillRect(gutter, lane.y, plotW, LANE_H);
+		}
+
+		ctx.save();
+		ctx.beginPath();
+		ctx.rect(gutter, 0, plotW, height);
+		ctx.clip();
+
+		// Newest tick slides in from the right edge as progress goes 0 → 1.
+		const right = gutter + plotW;
+		for (let age = 0; age < history.length; age++) {
+			const col = history[history.length - 1 - age];
+			const x = right - (age + progress) * cell;
+			if (x + cell < gutter) break;
+
+			for (const lane of lanes) {
+				if (lane.kind === "thread") {
+					const occ = col.threads[lane.i];
+					if (occ === "reserved") {
+						ctx.fillStyle = patterns.reserved;
+						ctx.fillRect(x, lane.y, cell, LANE_H);
+					} else if (occ) {
+						ctx.fillStyle = vmColor(occ.vm);
+						ctx.fillRect(x, lane.y, cell, LANE_H);
+						// Mark context switches with a thin gap.
+						const prev = history[history.length - 2 - age];
+						if (prev && prev.threads[lane.i] !== occ) {
+							ctx.fillStyle = colors.bg;
+							ctx.fillRect(x, lane.y, 1, LANE_H);
+						}
+					}
+				} else {
+					const s = col.you[lane.i];
+					if (s === "run") {
+						ctx.fillStyle = colors.green;
+						ctx.fillRect(x, lane.y, cell, LANE_H);
+					} else if (s === "wait") {
+						ctx.fillStyle = patterns.steal;
+						ctx.fillRect(x, lane.y, cell, LANE_H);
+						ctx.fillStyle = colors.red;
+						ctx.fillRect(x, lane.y, cell, 2);
+						ctx.fillRect(x, lane.y + LANE_H - 2, cell, 2);
+					}
+				}
+			}
+		}
+		ctx.restore();
+
+		// Divider between the two cores.
+		ctx.strokeStyle = colors.line;
+		ctx.setLineDash([2, 3]);
+		ctx.beginPath();
+		const between = lanes[2].y - 5;
+		ctx.moveTo(gutter, between);
+		ctx.lineTo(right, between);
+		ctx.stroke();
+		ctx.setLineDash([]);
+	}
+
+	// ── Readouts ──────────────────────────────────────────────────────────────
+
+	const el = (id) => document.getElementById(id);
+	let lastStory = "";
+	let storyAt = 0;
+
+	function pct(n) {
+		return (Math.round(n * 10) / 10).toFixed(1);
+	}
+
+	function updateReadouts() {
+		const recent = history.slice(-WINDOW);
+		let run = 0, wait = 0, idle = 0;
+		recent.forEach((col) => col.you.forEach((s) => {
+			if (s === "run") run++; else if (s === "wait") wait++; else idle++;
+		}));
+		const total = run + wait + idle || 1;
+		const steal = (wait / total) * 100;
+		const got = run + wait ? (run / (run + wait)) * 100 : 100;
+
+		el("s-steal").textContent = Math.round(steal) + "%";
+		el("s-steal").classList.toggle("bad", steal >= 5);
+		el("s-got").textContent = Math.round(got) + "%";
+		el("s-got").classList.toggle("bad", got < 90);
+
+		const vcpus = vms.length * 2;
+		if (settings.mode === "dedicated") {
+			el("s-over").textContent = (Math.max(0, vcpus - 2) / 2).toFixed(1) + "×";
+			el("s-over-what").textContent = "neighbour vCPUs per core-1 thread";
+		} else {
+			el("s-over").textContent = (vcpus / THREADS).toFixed(1) + "×";
+			el("s-over-what").textContent = `${vcpus} vCPUs on ${THREADS} threads`;
+		}
+
+		// Drop the always-zero sy and wa columns when there isn't room for them.
+		const full = layout.width >= 440;
+		const col = (n) => pct(n).padStart(full ? 5 : 0);
+		el("top").innerHTML =
+			`%Cpu(s): ${col((run / total) * 100)} us, ${full ? " 0.0 sy, " : ""}` +
+			`${col((idle / total) * 100)} id, ${full ? " 0.0 wa, " : ""}` +
+			`<span class="st">${col(steal)} st</span>`;
+
+		const last = history[history.length - 1];
+		const q = el("queue");
+		q.textContent = "";
+		const label = document.createElement("span");
+		label.className = "label";
+		label.textContent = "Ready, waiting for a thread:";
+		q.append(label);
+		if (!last || !last.queue.length) {
+			const empty = document.createElement("span");
+			empty.className = "empty";
+			empty.textContent = "nobody";
+			q.append(empty);
+		} else {
+			last.queue.forEach((c) => {
+				const chip = document.createElement("span");
+				chip.className = "chip" + (c.vm.you ? " you" : "");
+				chip.style.background = vmColor(c.vm);
+				chip.textContent = `${c.vm.short}·v${c.idx}`;
+				q.append(chip);
+			});
+		}
+
+		// While playing, the narration changes at most every couple of seconds so it's readable.
+		const now = performance.now();
+		const story = narrate(steal, got);
+		if (story !== lastStory && (now - storyAt > 2500 || !lastStory || !playing)) {
+			el("story").textContent = story;
+			lastStory = story;
+			storyAt = now;
+		}
+	}
+
+	function narrate(steal, got) {
+		if (settings.mode === "dedicated") {
+			return "Your vCPUs are pinned to core 0, so your steal time is zero. The hatched gaps are the trade-off: when you're idle, that core sits unused, and nobody else can borrow it. That idle capacity is what you pay extra for.";
+		}
+		if (settings.neighbours === 0) {
+			return "No neighbours yet. You have all 4 threads to yourself, so whenever your vCPUs have work, a thread is free. Add some neighbours.";
+		}
+		if (steal < 1) {
+			return "Plenty of room. When your vCPUs wake up there's nearly always a free thread, so you get the CPU right away. This is why shared plans feel fine most of the time.";
+		}
+		if (steal < 8) {
+			return `Some contention. Now and then all 4 threads are taken when your vCPU wakes up, so it waits in the queue for a slice to end. You got a thread straight away ${Math.round(got)}% of the time.`;
+		}
+		return `Noisy neighbours. Your vCPUs had work to do but were stuck waiting for a thread ${Math.round(100 - got)}% of the time. Your VM can't see the neighbours; all it sees is that time showing up as st in top.`;
+	}
+
+	// ── Controls ──────────────────────────────────────────────────────────────
+
+	function syncButtons() {
+		document.querySelectorAll(".seg").forEach((group) => {
+			const key = group.dataset.key;
+			group.querySelectorAll("button").forEach((b) => {
+				b.setAttribute("aria-pressed", String(b.dataset.value === String(settings[key])));
+			});
+		});
+	}
+
+	document.querySelectorAll(".seg").forEach((group) => {
+		group.addEventListener("click", (e) => {
+			const b = e.target.closest("button");
+			if (!b) return;
+			const key = group.dataset.key;
+			settings[key] = key === "neighbours" ? Number(b.dataset.value) : b.dataset.value;
+			if (key === "mode") {
+				// Start fairness from scratch, or time banked on the old plan
+				// would starve whoever got more CPU under it.
+				threads.forEach((t) => (t.occ = null));
+				allVcpus().forEach((c) => (c.vruntime = 0));
+			}
+			syncVms();
+			syncButtons();
+			renderLegend();
+			lastStory = "";
+			updateReadouts();
+		});
+	});
+
+	function renderLegend() {
+		const items = [`<span><i class="swatch" style="background:${colors.green}"></i>You</span>`];
+		vms.slice(1).forEach((vm) => {
+			items.push(`<span><i class="swatch" style="background:${vmColor(vm)}"></i>${vm.name}</span>`);
+		});
+		items.push(`<span><i class="swatch steal"></i>Your vCPU waiting (steal)</span>`);
+		if (settings.mode === "dedicated") {
+			items.push(`<span><i class="swatch reserved"></i>Reserved for you, idle</span>`);
+		}
+		el("legend").innerHTML = items.join("");
+	}
+
+	let playing = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+	let speedIdx = 0;
+	let visible = true;
+
+	function syncTransport() {
+		el("play").textContent = playing ? "Pause" : "Play";
+		el("step").disabled = playing;
+	}
+
+	el("play").addEventListener("click", () => {
+		playing = !playing;
+		syncTransport();
+	});
+	el("step").addEventListener("click", () => {
+		step();
+		progress = 1;
+		updateReadouts();
+		draw(progress);
+	});
+	el("speed").addEventListener("click", () => {
+		speedIdx = (speedIdx + 1) % SPEEDS.length;
+		el("speed").textContent = SPEEDS[speedIdx] + "×";
+		el("speed").setAttribute("aria-label", "Playback speed " + SPEEDS[speedIdx] + "×");
+	});
+
+	// ── Hover tooltip ─────────────────────────────────────────────────────────
+
+	function hideTip() { tip.style.opacity = 0; }
+
+	canvas.addEventListener("pointermove", (e) => {
+		const r = canvas.getBoundingClientRect();
+		const x = e.clientX - r.left, y = e.clientY - r.top;
+		const { gutter, cell, lanes, plotW } = layout;
+		const lane = lanes.find((l) => y >= l.y && y < l.y + LANE_H);
+		if (!lane || x < gutter) return hideTip();
+
+		const age = Math.floor((gutter + plotW - x) / cell - (playing ? progress : 1)) + 1;
+		const col = history[history.length - 1 - age];
+		if (!col) return hideTip();
+
+		let text;
+		if (lane.kind === "thread") {
+			const occ = col.threads[lane.i];
+			text = occ === "reserved" ? "reserved for you, idle"
+				: occ ? `${occ.vm.name}, vCPU ${occ.idx}` : "idle";
+			text = `${lane.label}: ${text}`;
+		} else {
+			const s = col.you[lane.i];
+			text = `your vCPU ${lane.i}: ` + (s === "run" ? "running" : s === "wait" ? "ready but waiting (steal)" : "idle");
+		}
+		tip.textContent = `t=${col.tick} · ${text}`;
+		const left = Math.min(Math.max(x - tip.offsetWidth / 2, 0), r.width - tip.offsetWidth);
+		tip.style.left = left + "px";
+		tip.style.top = (lane.y - 26) + "px";
+		tip.style.opacity = 1;
+	});
+	canvas.addEventListener("pointerleave", hideTip);
+
+	// ── Loop ──────────────────────────────────────────────────────────────────
+
+	let progress = 1;
+	let lastFrame = performance.now();
+	let acc = 0;
+
+	function frame(now) {
+		const dt = Math.min(now - lastFrame, 100);
+		lastFrame = now;
+		if (playing && visible) {
+			acc += dt * SPEEDS[speedIdx];
+			while (acc >= TICK_MS) {
+				acc -= TICK_MS;
+				step();
+				updateReadouts();
+			}
+			progress = acc / TICK_MS;
+		}
+		if (visible) draw(playing ? progress : 1);
+		requestAnimationFrame(frame);
+	}
+
+	// Don't burn CPU when nobody's looking (a bit ironic otherwise).
+	new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }).observe(canvas);
+	document.addEventListener("visibilitychange", () => { lastFrame = performance.now(); });
+
+	new ResizeObserver(() => computeLayout()).observe(canvas.parentElement);
+	new MutationObserver(() => { readColors(); renderLegend(); updateReadouts(); })
+		.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+	matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readColors);
+
+	syncVms();
+	computeLayout();
+	// Start with some history so the timeline isn't empty on first view.
+	for (let i = 0; i < 160; i++) step();
+	syncButtons();
+	syncTransport();
+	renderLegend();
+	updateReadouts();
+	requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

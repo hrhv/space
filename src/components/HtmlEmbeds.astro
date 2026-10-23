@@ -1,0 +1,46 @@
+<script is:inline>
+	/* ── HTML embeds ──────────────────────────────────────────────────────────
+	   Iframes created from ```embed blocks (see plugins/remark-html-embed.mjs).
+	   They're same-origin, so the page can reach into them to:
+	   - size each iframe to its content, so it reads like part of the post
+	   - mirror the site's theme as data-theme="light|dark" on the embed's <html>
+	   - use the embed's own <title> as the iframe's accessible name */
+
+	function embedTheme() {
+		return document.documentElement.classList.contains("dark") ? "dark" : "light";
+	}
+
+	function setupEmbed(frame) {
+		const doc = frame.contentDocument;
+		// A lazy iframe holds an empty about:blank document until it's near the viewport.
+		if (!doc || !doc.documentElement || doc.URL === "about:blank") return;
+
+		doc.documentElement.dataset.theme = embedTheme();
+		if (doc.title) frame.title = doc.title;
+
+		// Not scrollHeight: it rounds down (leaving a sliver to scroll) and never
+		// drops below the iframe's current height, so the embed couldn't shrink.
+		const fit = () => {
+			frame.style.height = Math.ceil(doc.documentElement.getBoundingClientRect().height) + "px";
+		};
+		new ResizeObserver(fit).observe(doc.documentElement);
+		fit();
+	}
+
+	(function () {
+		const frames = document.querySelectorAll("iframe.html-embed");
+		if (!frames.length) return;
+
+		frames.forEach((frame) => {
+			frame.addEventListener("load", () => setupEmbed(frame));
+			if (frame.contentDocument?.readyState === "complete") setupEmbed(frame);
+		});
+
+		new MutationObserver(() => {
+			frames.forEach((frame) => {
+				const root = frame.contentDocument?.documentElement;
+				if (root) root.dataset.theme = embedTheme();
+			});
+		}).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+	})();
+</script>
